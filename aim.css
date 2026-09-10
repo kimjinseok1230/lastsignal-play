@@ -1,0 +1,30 @@
+.aim-zone{display:none}
+.aim-reticle{position:fixed;width:26px;height:26px;border:1px solid #e3f5aacc;border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:22;box-shadow:0 0 0 1px #101a08bb,0 0 15px #ccec6333}
+.aim-reticle:before,.aim-reticle:after{content:'';position:absolute;background:#ebfbd0;box-shadow:0 0 2px #15210f}
+.aim-reticle:before{left:11px;top:-5px;width:2px;height:7px;box-shadow:0 27px #ebfbd0}
+.aim-reticle:after{left:-5px;top:11px;width:7px;height:2px;box-shadow:27px 0 #ebfbd0}
+.aim-reticle i{position:absolute;left:11px;top:11px;width:2px;height:2px;background:#f4ffd8}
+.playing.pointer-aim #world{cursor:none}.ability-dock{z-index:3}
+@media(max-width:800px),(pointer:coarse){
+  .touch-zone,.aim-zone{display:block;position:absolute;bottom:220px;width:48%;height:30%;pointer-events:auto;touch-action:none;user-select:none;z-index:1}
+  .touch-zone{left:0}.aim-zone{right:0}
+  #stick-base,#aim-stick-base{position:absolute;width:100px;height:100px;bottom:28px;display:flex;align-items:center;justify-content:center;border:1px solid #c6dd8270;border-radius:50%;background:#8da34d0d}
+  #stick-base{left:28px}#aim-stick-base{left:calc(100% - 128px);border-color:#f1ca9699;background:#cb986414}
+  #stick-knob,#aim-stick-knob{width:40px;height:40px;flex-shrink:0;border-radius:50%;border:1px solid #d8eb9899;background:#b3d15b26}
+  #aim-stick-knob{border-color:#f1cb9caa;background:#d1a06838}
+  .touch-zone>span,.aim-zone>span{position:absolute;bottom:0;left:28px;font:12px var(--mono);color:#cad6af;letter-spacing:.3px;pointer-events:none}
+  .aim-zone>span{left:auto;right:28px;color:#ecd0a8}
+  .aim-zone.active #aim-stick-base{box-shadow:0 0 24px #f2b47816}
+  .ability-dock{left:50%;right:auto;bottom:145px;transform:translateX(-50%);flex-direction:row;width:min(320px,calc(100% - 32px));gap:8px}
+  .ability{flex:1;min-width:0;width:auto;height:54px}.ability kbd{display:none}
+  .relay-progress{top:278px;bottom:auto;width:210px;left:50%;transform:translateX(-50%)}
+  .signal-hud{bottom:72px;left:16px;right:16px;transform:none;width:auto}
+  .game-hint{display:none}
+}
+@media(max-height:500px) and (min-width:600px){
+  .touch-zone,.aim-zone{bottom:95px;height:45%;width:35%}
+  #stick-base,#aim-stick-base{bottom:24px}.touch-zone>span,.aim-zone>span{bottom:0}
+  .ability-dock{bottom:15px;left:auto;right:16px;transform:none;width:265px}.ability{height:53px}
+  .signal-hud{bottom:80px;left:auto;right:16px;width:225px;transform:none}
+  .relay-progress{top:145px;bottom:auto;width:180px}
+}

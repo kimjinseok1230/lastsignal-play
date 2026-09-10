@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#11140e">
+  <meta name="description" content="끊어진 신호 너머에서 15분간 생존하세요. 무기를 조합하고 중계기를 복구하는 로그라이크 생존 게임 Last Signal.">
+  <title>Last Signal — 마지막 신호</title>
+  <link rel="icon" href="./icon.svg?v=3" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css?v=3">
+  <link rel="stylesheet" href="./interference.css?v=3">
+  <link rel="stylesheet" href="./aim.css?v=3">
+</head>
+<body>
+  <canvas id="world" aria-label="Last Signal 생존 게임 필드"></canvas>
+  <div class="vignette" aria-hidden="true"></div>
+  <div id="app">
+    <header class="topbar">
+      <button id="home-mark" class="wordmark" aria-label="Last Signal 메뉴">L<span class="brand-signal">▰</span>S <span class="edition">SURVIVAL PROTOCOL</span></button>
+      <div class="top-actions">
+        <button id="sound-btn" class="icon-button" title="소리 켜기 / 끄기" aria-label="소리 켜기">♪ <span>OFF</span></button>
+        <button id="fullscreen-btn" class="icon-button" title="전체 화면" aria-label="전체 화면">⛶</button>
+        <button id="pause-btn" class="icon-button hidden" aria-label="일시정지">Ⅱ</button>
+      </div>
+    </header>
+
+    <main id="menu" class="menu-screen">
+      <section class="menu-primary">
+        <div class="eyebrow"><span class="signal-bars"><i></i><i></i><i></i><i></i></span> CHAPTER II / INTERFERENCE <span class="blink">_</span></div>
+        <h1>LAST<br><span>SIGNAL<span class="title-period">.</span></span></h1>
+        <div class="menu-story"><span class="line-mark"></span><p>당신의 신호를, 무언가 듣고 있다.<br>주파수를 맞추고. 끝까지 살아남아라.</p></div>
+        <div class="loadout-label"><span>01 / 오퍼레이터 선택</span><span id="class-count">3 AVAILABLE</span></div>
+        <div id="class-picker" class="class-picker" role="group" aria-label="오퍼레이터 선택"></div>
+        <p id="class-description" class="class-description"></p>
+        <div class="chapter-note"><span>NEW SIGNAL</span> 마우스 조준 · 자동 연사 · 보조 무기 3슬롯</div>
+        <div class="start-row"><button id="start-btn" class="primary-button"><span>신호 추적 시작</span><span class="button-arrow">↗</span></button><button id="continue-btn" class="secondary-button hidden">이어서 하기</button></div>
+        <div class="menu-links"><button id="base-btn">기지 정비 <span id="credits-badge">0</span></button><span class="divider"></span><button id="guide-btn">생존 가이드 <span>↗</span></button><span class="divider"></span><button id="records-btn">작전 기록 <span>↗</span></button></div>
+      </section>
+      <aside class="mission-panel">
+        <div class="corner-box"><span class="eyebrow dim">MISSION / 007</span><div class="mission-time">15<span>:</span>00</div><p>새벽까지 살아남으세요.</p><div class="mission-divider"></div><div class="mission-item"><b>01</b><span>신호 파편을 모아 성장</span></div><div class="mission-item"><b>02</b><span>중계기 3개 복구</span></div><div class="mission-item"><b>03</b><span>최후의 감시자 처치 · 탈출</span></div><div class="mission-bottom"><span class="status-dot"></span> NO ONE LEFT BEHIND</div></div>
+        <div class="arena-label"><span class="cross">+</span><div>폐쇄 구역 <b>07</b><small>OUTER PERIMETER / SIGNAL LOST</small></div></div>
+      </aside>
+      <footer class="menu-footer"><span>HEADPHONES RECOMMENDED</span><span id="best-summary">YOUR SIGNAL STARTS HERE</span><span>LAST SIGNAL <b>v2.1</b></span></footer>
+    </main>
+
+    <section id="hud" class="hud hidden" aria-label="게임 상태">
+      <div class="xp-track"><div id="xp-fill"></div></div>
+      <div class="player-hud"><div class="hud-label"><span id="operator-name">러너</span><b id="level-label">LV. 01</b></div><div class="health-track"><div id="health-fill"></div></div><div class="health-numbers"><span id="hp-number">110 / 110</span><span>생명력</span></div><div id="objective" class="objective"></div></div>
+      <div class="timer-hud"><span id="phase-label">신호 탐색</span><strong id="timer">00:00</strong><span class="timer-target">/ 15:00</span></div>
+      <div class="stats-hud"><div><span>격파</span><b id="kills">0000</b></div><div><span>중계기</span><b id="relays">0 / 3</b></div><canvas id="minimap" width="150" height="150" aria-label="중계기와 플레이어 위치 지도"></canvas></div>
+      <div id="boss-hud" class="boss-hud hidden"><div><span id="boss-name">감시자</span><span id="boss-health"></span></div><div class="boss-track"><div id="boss-fill"></div></div></div>
+      <div id="weapon-dock" class="weapon-dock"></div>
+      <div class="signal-hud"><div class="signal-status"><span id="interference-label">정상 수신</span><b id="interference-countdown">00:48</b></div><div class="resonance-track"><i id="resonance-fill"></i></div><div class="resonance-label"><span id="combo-label">공명 25%</span><span id="protocol-label">CARRIER / 07</span></div></div>
+      <div id="game-hint" class="game-hint"><kbd>W A S D</kbd> 이동 <span>·</span> 마우스 조준 <span>·</span> 자동 연사</div>
+      <div class="ability-dock"><button id="dash-btn" class="ability"><span><kbd>SPACE</kbd> 대시</span><b id="dash-status">READY</b><i id="dash-fill"></i></button><button id="pulse-btn" class="ability pulse"><span><kbd>E</kbd> 전자기 펄스</span><b id="pulse-status">READY</b><i id="pulse-fill"></i></button><button id="overdrive-btn" class="ability overdrive"><span><kbd>Q</kbd> 과부하</span><b id="overdrive-status">25%</b><i id="overdrive-fill"></i></button></div>
+      <div id="relay-progress" class="relay-progress hidden"><span>중계기 복구 중 · 원 안에 머무르세요</span><div><i id="relay-fill"></i></div></div>
+      <div id="toast" class="toast hidden" role="status"></div>
+      <div id="touch-zone" class="touch-zone" aria-label="터치 이동 조이스틱"><div id="stick-base"><div id="stick-knob"></div></div><span>이동 · MOVE</span></div>
+      <div id="aim-zone" class="aim-zone" aria-label="터치 조준 조이스틱"><div id="aim-stick-base"><div id="aim-stick-knob"></div></div><span>조준 · AIM</span></div>
+      <div id="aim-reticle" class="aim-reticle hidden" aria-hidden="true"><i></i></div>
+    </section>
+    <div id="overlay" class="overlay hidden"><section id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1"></section></div>
+    <div id="save-notice" class="save-notice hidden" role="status">이 브라우저에서는 저장할 수 없습니다. 현재 게임은 계속 플레이할 수 있습니다.</div>
+  </div>
+  <script type="module" src="./app.js?v=3"></script>
+</body>
+</html>

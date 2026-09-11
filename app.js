@@ -1,5 +1,5 @@
 import {bindStick} from './aim.js?v=cat1';
-import {SignalGame as Game} from './cat-game.js?v=cat1';
+import {SignalGame as Game} from './cat-game.js?v=cat2';
 import {Sound} from './audio.js?v=cat1';
 import {CLASSES,UPGRADES,EVOLUTIONS,BASE_UPGRADES,DURATION,WEAPONS,PROTOCOLS,createMeta,normalizeMeta,formatTime,xpRequired} from './data.js?v=cat1';
 

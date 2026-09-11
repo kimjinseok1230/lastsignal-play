@@ -40,3 +40,9 @@ Built-in imagegen으로 제작. 원본 생성 에셋에서 웹용 압축 및 스
 - 캐릭터: 투명 배경의 3종 고양이(치즈/크림/차콜)와 3종 청소·장난감 로봇, 일관된 게임 일러스트 스타일.
 
 에셋 위치: `assets/cat-store.webp`, `assets/cat-runner.webp`, `assets/cat-engineer.webp`, `assets/cat-warden.webp`, `assets/robot-cleaner.webp`, `assets/robot-toy.webp`, `assets/robot-boss.webp`.
+
+
+## 편의점 전투 배경
+- `assets/convenience-floor.webp`: 내장 image_gen으로 생성한 전용 배경.
+- 프롬프트: Square true overhead convenience store game floor, subdued teal tiles, stocked snack shelves, glass beverage refrigerators, checkout counters, open central fighting space, warm fluorescent lighting, hand-painted art, no characters, UI or text.
+- 기존 전투 HUD를 유지하면서 폐허 바닥을 편의점 내부로 교체. 시작 지점 주변에도 진열대 이미지를 배치. 진열대는 배경 장식으로 이동을 막지 않음.

@@ -40,3 +40,5 @@ body:not(.playing) .modal{color:#243256}
 @media(prefers-reduced-motion:no-preference){.lobby-cat{animation:lobby-breathe 4s ease-in-out infinite}@keyframes lobby-breathe{50%{transform:translateX(-50%) translateY(-5px)}}}
 
 .app-lobby.menu-screen{gap:0;align-items:stretch}.app-lobby .start-row{flex-direction:row}.app-lobby .selection-mark:empty{display:none}
+
+.test-room-link{display:block;text-align:center;color:#bdeedc;font-size:14px;padding:12px 4px;text-decoration:none;min-height:44px}.test-room-link:hover{color:#ffe398}

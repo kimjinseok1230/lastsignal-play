@@ -94,3 +94,6 @@ window.CatRewardedAds = {
 - 9개 고유 무기 음색, 명중/처치/피격/보상 효과. 음악/효과음 독립 볼륨, 반복음 제한, 최대72음, 컴프레서. 일시정지/강화/사망 중 음악 페이드. 기존 음소거 설정 유지; 신규 사용자는 첫 플레이 터치 후 소리 활성화.
 - PASSIVES(roster.js)에12종 패시브 설명 정의. 도감과 일시정지 화면에서 조건 확인. 후추3번째 방어, 스파이더 감속처치 대시회복, 눈꽃 냉기증폭, 닌자 대시강화, 셰프 화상처치 회복, 닥터 비피격재생, 번개5처치 쿨다운회복, 별빛 경험치, 우주 수집범위, 월식 자동부활. 치즈잔상/모찌시작깃털 유지. 패시브 재사용 상태를 저장하며 월식 자동부활은 판당 부활1회를 소모.
 - tests/audio.mjs, tests/passives.mjs 추가. 자동 검증 전체 통과. 이전 시작불가 수정은 실제 공개 브라우저에서 플레이 클릭, 전투시간00:16, 사망/부활 선택 화면까지 확인.
+
+### cat9 · combat clarity and active skills
+Combat panels now use transparent backgrounds, thin bars and round touch buttons. All 12 cats have a dedicated E ability; descriptions appear in the collection and pause screen. Cooldowns scale with existing upgrades and survive saves. Monster defeat adds brief shards/bursts and size-dependent synthesized sounds, respecting particle settings and audio rate limits. Covered by tests/active-skills.mjs.

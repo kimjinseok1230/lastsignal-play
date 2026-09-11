@@ -62,3 +62,13 @@ html,body{background:var(--bg);color:var(--text)}body:not(.playing){overflow:aut
  .playing .touch-zone,.playing .aim-zone{bottom:82px!important;height:42vh!important;width:36%!important}
  .playing .signal-hud{bottom:15px;left:50%;right:auto;transform:translateX(-50%);width:200px}
 }
+
+/* Quiet combat HUD: readable text and thin bars, without floating panels. */
+.playing .player-hud,.playing .timer-hud,.playing .stats-hud,.playing .signal-hud,.playing .boss-hud{background:none;border:0;box-shadow:none;backdrop-filter:none;padding:4px;text-shadow:0 1px 4px #000,0 0 8px #000}
+.playing .health-track{height:7px}.playing .objective{margin-top:5px}.playing .objective small{display:none}
+.playing #minimap{border-radius:50%;opacity:.7;background:#0b182580;border:1px solid #d5ffee33}
+.playing .timer-target{display:none}.playing .timer-hud strong{font-size:27px}
+.playing .weapon-chip{background:#0b182566;border:0;border-radius:50%;width:42px;height:42px;box-shadow:none}.playing .weapon-chip.empty{display:none}.playing .weapon-chip small{font-size:10px}.playing .weapon-chip .weapon-icon{font-size:19px}
+.playing .ability{width:76px;height:76px;border-radius:50%;background:#0b1825a8;border:1px solid #c4f2e64d;box-shadow:none;overflow:hidden;gap:4px;padding:8px 3px}.playing .ability>span{font-size:12px;line-height:1.2}.playing .ability kbd{display:none}.playing .ability b{font-size:11px}.playing .ability i{bottom:10px;left:18%;max-width:64%;height:2px}.playing .ability.charged{box-shadow:0 0 12px #ffd18a44}
+.playing .signal-hud{width:200px}.playing .resonance-track{height:3px}.playing .relay-progress{background:none;box-shadow:none;border:0;text-shadow:0 1px 5px #000}
+@media(max-width:800px){.playing .ability{width:62px;height:62px}.playing .weapon-chip{width:30px;height:34px}.playing .signal-hud{bottom:88px;width:156px}.playing .timer-hud strong{font-size:23px}.playing .stats-hud{width:74px}.playing #minimap{width:56px;height:56px}}

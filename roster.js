@@ -16,3 +16,17 @@ export function missionUnlocks(meta){const gained=[];for(const c of EXTRA_CATS){
 export function buyCat(meta,id){const c=EXTRA_CATS.find(c=>c.id===id);if(!c||c.unlock!=='coin'||meta.collection.owned.includes(id)||meta.credits<c.cost)return false;meta.credits-=c.cost;meta.collection.owned.push(id);return true;}
 export function buyTicket(meta){if(meta.credits<TICKET_COST)return false;meta.credits-=TICKET_COST;meta.collection.tickets++;return true;}
 export function drawCat(meta,random=Math.random){if(meta.credits<DRAW_COST)return null;const all=EXTRA_CATS.filter(c=>c.unlock==='gacha'),missing=all.filter(c=>!meta.collection.owned.includes(c.id));const guarantee=meta.collection.pity>=9&&missing.length>0,pool=guarantee?missing:all;const total=pool.reduce((s,c)=>s+c.weight,0);let roll=Math.max(0,Math.min(.999999,random()))*total;const cat=pool.find(c=>(roll-=c.weight)<0)||pool.at(-1);meta.credits-=DRAW_COST;meta.collection.draws++;const duplicate=meta.collection.owned.includes(cat.id);if(duplicate){meta.credits+=45;meta.collection.pity++;}else{meta.collection.owned.push(cat.id);meta.collection.pity=0;}return {cat,duplicate,guarantee};}
+export const PASSIVES={
+ runner:{name:'잔상 발자국',desc:'대시 시작 지점에 잠시 뒤 폭발하는 잔상 덫을 남깁니다.'},
+ engineer:{name:'든든한 깃털',desc:'깃털 회오리 1레벨을 장착한 상태로 시작합니다.'},
+ warden:{name:'세 번째는 버틴다',desc:'실제로 피해를 받는 매 3번째 공격의 피해가 50% 감소합니다.'},
+ spider:{name:'거미줄 사냥꾼',desc:'느려진 적을 처치하면 대시의 남은 재사용 시간이 0.4초 줄어듭니다.'},
+ frost:{name:'살얼음',desc:'냉기에 걸린 적에게 주는 피해가 15% 증가합니다.'},
+ ninja:{name:'그림자 일격',desc:'대시 후 2초 안에 적중하는 첫 주 무기 공격의 피해가 60% 증가합니다.'},
+ chef:{name:'따끈한 한입',desc:'불타는 적을 처치하면 체력 3을 회복합니다. 재사용 1.5초.'},
+ nurse:{name:'야간 진료',desc:'4초 동안 피격되지 않으면 초당 체력 0.6을 추가로 회복합니다.'},
+ spark:{name:'충전 발바닥',desc:'적 5마리를 처치할 때마다 냥펀치의 남은 재사용 시간이 1초 줄어듭니다.'},
+ wizard:{name:'별빛 공부',desc:'간식 조각에서 얻는 경험치가 15% 증가합니다.'},
+ astro:{name:'간식 중력',desc:'간식과 코인을 끌어당기는 수집 반경이 40% 넓어집니다.'},
+ moon:{name:'아홉 번째 밤',desc:'첫 사망 시 부활권 없이 체력 35%로 자동 부활합니다. 한 판의 부활 기회 1회를 사용합니다.'}
+};

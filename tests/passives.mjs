@@ -1,0 +1,11 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {CatGame} from '../cat-game.js?v=cat8';
+import {createMeta} from '../data.js?v=cat8';
+const make=id=>{const g=new CatGame({getContext:()=>null},{},{play(){},ambient(){}},{particles:false,shake:false});g.start(id,createMeta());g.enemies=[];g.random=()=>.99;return g;};
+const enemy=g=>{const e=g.spawnEnemy('brute',250,0);e.warmup=0;e.hp=e.maxHp=10000;return e;};
+test('starter passives grant an echo, initial feathers and third-hit guard',()=>{const r=make('runner');r.dash();assert(r.traps.some(t=>t.echo));assert.equal(make('engineer').u.orbit,1);const w=make('warden');const hp=w.player.hp;for(let i=0;i<3;i++){w.player.invuln=0;w.hitPlayer(20);}assert.equal(hp-w.player.hp,44);});
+test('spider slow kills and spark fifth kills reduce their distinct cooldowns',()=>{const s=make('spider'),e=enemy(s);e.slow=2;s.player.dashCd=2;s.kill(e);assert.equal(s.player.dashCd,1.6);const z=make('spark');z.kills=4;z.player.pulseCd=5;z.kill(enemy(z));assert.equal(z.player.pulseCd,4);});
+test('frost boosts chilled damage and ninja bonus is consumed once',()=>{const f=make('frost'),e=enemy(f);e.chill=2;f.damage(e,100,'test');assert.equal(e.hp,9885);const n=make('ninja'),b=enemy(n);n.dash();n.damage(b,100,'bullet');assert.equal(b.hp,9840);n.damage(b,100,'bullet');assert.equal(b.hp,9740);});
+test('chef heal has cooldown; nurse, wizard and astro modifiers are stable across recalculation',()=>{const c=make('chef');c.player.hp=50;for(let i=0;i<2;i++){const e=enemy(c);e.burn=2;c.kill(e);}assert.equal(c.player.hp,53);for(const [id,key,value] of [['nurse','regen',.6],['wizard','xpBonus',1.15],['astro','pickup',133]]){const g=make(id);g.recalculate();g.recalculate();assert.equal(g.stats[key],value);}});
+test('moon self revive consumes the single revival and survives save/restore',()=>{const g=make('moon');g.player.hp=0;g.finish(false);assert.equal(g.state,'playing');assert.equal(g.player.hp,g.player.maxHp*.35);assert.equal(g.revivesUsed,1);const h=make('runner');assert(h.restore(JSON.parse(JSON.stringify(g.serialize()))));assert.equal(h.revivesUsed,1);h.player.hp=0;h.finish(false);assert.equal(h.state,'ended');});

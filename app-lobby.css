@@ -34,3 +34,5 @@ body:not(.playing) .modal{color:#243256}
 @media(max-height:750px) and (max-width:699px){.lobby-stage{height:224px}.lobby-cat{width:152px;height:152px;top:60px}.lobby-controls{padding-top:12px}.app-lobby .class-card{min-height:76px}.app-lobby .cat-portrait{height:45px}.lobby-mission{padding:8px 10px}.lobby-record{margin-top:8px}}
 @media(prefers-reduced-motion:no-preference){.lobby-cat{animation:lobby-breathe 4s ease-in-out infinite}@keyframes lobby-breathe{50%{transform:translateX(-50%) translateY(-4px)}}}
 @media(max-height:750px) and (max-width:699px){.app-lobby .class-description{display:none}.lobby-stage{height:200px}.lobby-cat{top:46px}.app-lobby h1{font-size:21px}.lobby-record{display:none}.lobby-controls{padding-top:10px}.app-lobby .class-picker{margin-bottom:7px}}
+
+.app-lobby .class-description{height:auto;min-height:36px}.collection-card .passive-note{padding:9px;background:#e8edf6;border-radius:8px;font-size:12px;width:100%}

@@ -1,4 +1,4 @@
-import {EXTRA_CATS,collectionMeta} from './roster.js?v=cat9';
+import {EXTRA_CATS,collectionMeta} from './roster.js?v=cat11';
 export const VERSION = 1;
 export const EDITION = 2;
 export const DURATION = 900;
@@ -24,14 +24,14 @@ export const UPGRADES = [
   {id:'regen',name:'따뜻한 우유',icon:'🥛',max:4,desc:'4초간 피격이 없으면 초당 생명력 0.22 회복',type:'회복'},
   {id:'armor',name:'두툼한 담요',icon:'🧣',max:4,desc:'받는 피해 −2 · 최대 생명력 +10',type:'방어'},
   {id:'crit',name:'냥냥 관찰력',icon:'👀',max:4,desc:'치명타 확률 +10% · 치명타 피해 +25%',type:'정밀'},
-  {id:'pulse',name:'힘찬 냥펀치',icon:'🥊',max:4,desc:'냥펀치 범위 +20% · 재사용 −12%',type:'액티브'},
+  {id:'pulse',name:'힘찬 전용 스킬',icon:'🥊',max:4,desc:'전용 스킬 범위 +20% · 재사용 −12%',type:'액티브'},
   {id:'rail',name:'레이저 장난감',icon:'🔦',max:5,desc:'충전 후 직선 관통 광선 · 장난감 보호막 무시',type:'정밀 무기'},
   {id:'mine',name:'캣닢 덫',icon:'🌿',max:5,desc:'이동 경로에 설치 · 접근한 적을 끌어당겨 폭발',type:'설치 무기'}
 ];
 export const WEAPONS=['orbit','arc','rocket','field','rail','mine'];
 export const PROTOCOLS=[
   {id:'glass',name:'매운맛 간식',icon:'🌶️',desc:'모든 피해 +30% / 최대 생명력 −20%',type:'간식 취향',protocol:true},
-  {id:'capacitor',name:'짜릿한 간식',icon:'🍬',desc:'냥펀치 재사용 −30% · 번개 피해 +20% / 주 무기 피해 −15%',type:'간식 취향',protocol:true},
+  {id:'capacitor',name:'짜릿한 간식',icon:'🍬',desc:'전용 스킬 재사용 −30% · 번개 피해 +20% / 주 무기 피해 −15%',type:'간식 취향',protocol:true},
   {id:'bastion',name:'든든한 간식',icon:'🍙',desc:'최대 생명력 +35 · 방어 +2 / 이동 속도 −12%',type:'간식 취향',protocol:true}
 ];
 export const EVOLUTIONS = [
@@ -40,7 +40,13 @@ export const EVOLUTIONS = [
   {id:'barrage',name:'참치캔 소나기',icon:'⋔',weapon:'rocket',support:'power',desc:'참치캔 폭탄이 세 갈래로 발사되며 폭발 범위가 증가합니다.'},
   {id:'absolute',name:'꽁꽁 아이스박스',icon:'❋',weapon:'field',support:'magnet',desc:'시원한 아이스팩 확장 · 동결된 적에게 번개가 맞으면 파쇄 피해.'},
   {id:'prism',name:'레이저 댄스',icon:'Ⅲ',weapon:'rail',support:'crit',desc:'레이저 장난감가 세 갈래로 분리되어 전방을 절단합니다.'},
-  {id:'singularity',name:'캣닢 블랙홀',icon:'⊗',weapon:'mine',support:'pulse',desc:'캣닢 덫이 폭발한 자리에 적을 끌어당기는 특이점을 남깁니다.'}
+  {id:'singularity',name:'캣닢 블랙홀',icon:'⊗',weapon:'mine',support:'pulse',desc:'캣닢 덫이 폭발한 자리에 적을 끌어당기는 특이점을 남깁니다.'},
+  {id:'aegis',name:'깃털 수호천사',icon:'🪽',weapon:'orbit',support:'armor',requires:'nova',desc:'깃털 대잔치 + 담요 2. 주변 적 탄환을 0.35초마다 하나씩 막아냅니다.'},
+  {id:'tesla',name:'털실 과충전',icon:'⚡',weapon:'arc',support:'crit',requires:'storm',desc:'털실 파티 + 관찰력 2. 4초마다 적에게 시한 전기를 심어 주변까지 폭발시킵니다.'},
+  {id:'confetti',name:'참치캔 불꽃축제',icon:'🎇',weapon:'rocket',support:'pierce',requires:'barrage',desc:'참치캔 소나기 + 막대과자 2. 폭발한 캔이 관통 파편 8개로 갈라집니다.'},
+  {id:'blizzard',name:'아이스 유성우',icon:'❄',weapon:'field',support:'haste',requires:'absolute',desc:'꽁꽁 아이스박스 + 급식기 2. 2.5초마다 사방으로 빙결 얼음창을 발사합니다.'},
+  {id:'crossbeam',name:'레이저 십자별',icon:'✛',weapon:'rail',support:'power',requires:'prism',desc:'레이저 댄스 + 진한 츄르 2. 4초마다 적 위치에 십자 관통 레이저를 추가합니다.'},
+  {id:'garden',name:'캣닢 정원',icon:'🌱',weapon:'mine',support:'magnet',requires:'singularity',desc:'캣닢 블랙홀 + 바구니 2. 5초마다 전방에 덫 3개를 추가 설치합니다.'}
 ];
 export const BASE_UPGRADES = [
   {id:'hull',name:'푹신한 방석',icon:'🛏️',desc:'시작 생명력 +10 / 단계',max:5,cost:60},

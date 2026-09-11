@@ -97,3 +97,6 @@ window.CatRewardedAds = {
 
 ### cat9 · combat clarity and active skills
 Combat panels now use transparent backgrounds, thin bars and round touch buttons. All 12 cats have a dedicated E ability; descriptions appear in the collection and pause screen. Cooldowns scale with existing upgrades and survive saves. Monster defeat adds brief shards/bursts and size-dependent synthesized sounds, respecting particle settings and audio rate limits. Covered by tests/active-skills.mjs.
+
+### cat11 · distinct skills and final evolutions
+E abilities now have separate play patterns: sprint trails, fixed turrets, damage absorption/reflection, rooting web zones, freezing lances, line teleport, aim-following flame cone, stationary healing zone, delayed electric marks, orbiting ranged familiars, gravity well and returning crescents. Timed skill state persists in saves and resets per run. Frozen bosses have a shorter lockout. First evolutions remain intact; six additional final evolutions require their first evolution plus a second support at level 2. Final effects include projectile interception, timed discharge, cluster fragments, radial freeze, cross lasers and forward trap gardens. Recipes appear in the guide; acquired evolution names appear when paused. Focused tests verify mechanics, prerequisites and save compatibility.

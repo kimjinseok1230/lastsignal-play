@@ -1,4 +1,4 @@
-import {CLASSES,UPGRADES,EVOLUTIONS,ENEMY_TYPES,RELAY_POSITIONS,DURATION,WORLD,VERSION,xpRequired} from './data.js?v=cat9';
+import {CLASSES,UPGRADES,EVOLUTIONS,ENEMY_TYPES,RELAY_POSITIONS,DURATION,WORLD,VERSION,xpRequired} from './data.js?v=cat11';
 
 const TAU=Math.PI*2;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -145,7 +145,7 @@ export class Game {
   addXp(amount){this.xp+=amount;while(this.xp>=xpRequired(this.level)){this.xp-=xpRequired(this.level);this.level++;this.pendingLevels++;}}
   updateRelays(dt){const p=this.player;let charging=null;for(const r of this.relays){if(r.active||this.t<r.unlock)continue;const d=Math.hypot(p.x-r.x,p.y-r.y);if(d<107){r.charge=Math.min(10,r.charge+dt);charging=r;if(r.charge>=10){r.active=true;this.collected+=35;p.hp=Math.min(p.maxHp,p.hp+35+(this.base.recovery||0)*6);this.pendingLevels++;this.ring(r.x,r.y,400,COLORS.mint,1.2);this.sound.play('relay');this.toast('간식 창고 0'+(r.id+1)+' 열기 · 무료 강화 · 생명력 회복',false,5);for(const e of this.enemies)if(!e.boss&&Math.hypot(e.x-r.x,e.y-r.y)<400)this.damage(e,350*this.stats.power,'relay');}}}this.charging=charging&&!charging.active?charging:null;}
   getChoices(exclude=[]){
-    const pool=UPGRADES.filter(u=>(this.u[u.id]||0)<u.max).map(u=>({...u,level:this.u[u.id]||0}));const evos=EVOLUTIONS.filter(e=>!this.evolved[e.id]&&(this.u[e.weapon]||0)>=5&&(this.u[e.support]||0)>=2).map(e=>({...e,evolution:true,type:'무기 진화',level:0}));
+    const pool=UPGRADES.filter(u=>(this.u[u.id]||0)<u.max).map(u=>({...u,level:this.u[u.id]||0}));const evos=EVOLUTIONS.filter(e=>!this.evolved[e.id]&&(!e.requires||this.evolved[e.requires])&&(this.u[e.weapon]||0)>=5&&(this.u[e.support]||0)>=2).map(e=>({...e,evolution:true,type:'무기 진화',level:0}));
     const selected=[];if(evos.length)selected.push(evos[Math.floor(this.random()*evos.length)]);
     else if(this.level<=4){const weapons=pool.filter(u=>['orbit','arc','rocket','field'].includes(u.id)&&!exclude.includes(u.id)&&!this.u[u.id]);if(weapons.length)selected.push(weapons[Math.floor(this.random()*weapons.length)]);}
     let candidates=pool.filter(u=>!exclude.includes(u.id)&&!selected.some(s=>s.id===u.id));if(candidates.length<3-selected.length)candidates=pool.filter(u=>!selected.some(s=>s.id===u.id));

@@ -1,7 +1,7 @@
-import {aiming} from './aim.js?v=cat9';
-import {Game} from './game.js?v=cat9';
-import {WORLD,DURATION,EDITION,ENEMY_TYPES,UPGRADES,EVOLUTIONS,WEAPONS,PROTOCOLS} from './data.js?v=cat9';
-import {signalVisuals} from './signal-visuals.js?v=cat9';
+import {aiming} from './aim.js?v=cat11';
+import {Game} from './game.js?v=cat11';
+import {WORLD,DURATION,EDITION,ENEMY_TYPES,UPGRADES,EVOLUTIONS,WEAPONS,PROTOCOLS} from './data.js?v=cat11';
+import {signalVisuals} from './signal-visuals.js?v=cat11';
 
 const TAU=Math.PI*2;
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
@@ -103,7 +103,7 @@ export class SignalGame extends Game {
   spawnLoot(type,x,y,value){if(type==='med'&&this.enemies.some(e=>e.dead&&!e.boss&&e.type!=='elite'&&e.x===x&&e.y===y)&&this.random()<.65)return;super.spawnLoot(type,x,y,value);}
   hitPlayer(amount){if(this.player.invuln>0||this.state!=='playing')return;this.lastDamageAt=this.t;this.combo=0;this.comboTimer=0;this.glitch=.16;this.resonance=Math.max(0,this.resonance-12);super.hitPlayer(amount*(this.overdrive>0?1.3:1));}
   updateRelays(dt){for(const r of this.relays)if(!r.active&&this.t>=r.unlock&&distance(r,this.player)<155&&!this.relayChallenge[r.id]){this.relayChallenge[r.id]=true;for(let i=0;i<6;i++){const a=i*TAU/6;this.spawnEnemy(i%3===0?'charger':'wraith',clamp(r.x+Math.cos(a)*440,-WORLD+40,WORLD-40),clamp(r.y+Math.sin(a)*440,-WORLD+40,WORLD-40));}this.toast('열기 간식 노출 · 간식 창고를 방어하세요.',true,4);}super.updateRelays(dt);}
-  getChoices(exclude=[]){if(this.level>=8&&!this.protocol)return PROTOCOLS.map(p=>({...p,level:0}));const owned=WEAPONS.filter(id=>this.u[id]);const eligible=UPGRADES.filter(u=>(this.u[u.id]||0)<u.max&&(!WEAPONS.includes(u.id)||this.u[u.id]||owned.length<this.weaponSlots));const evos=EVOLUTIONS.filter(e=>!this.evolved[e.id]&&(this.u[e.weapon]||0)>=5&&(this.u[e.support]||0)>=2);const result=[];
+  getChoices(exclude=[]){if(this.level>=8&&!this.protocol)return PROTOCOLS.map(p=>({...p,level:0}));const owned=WEAPONS.filter(id=>this.u[id]);const eligible=UPGRADES.filter(u=>(this.u[u.id]||0)<u.max&&(!WEAPONS.includes(u.id)||this.u[u.id]||owned.length<this.weaponSlots));const evos=EVOLUTIONS.filter(e=>!this.evolved[e.id]&&(!e.requires||this.evolved[e.requires])&&(this.u[e.weapon]||0)>=5&&(this.u[e.support]||0)>=2);const result=[];
     if(evos.length){const e=evos[Math.floor(this.random()*evos.length)];result.push({...e,evolution:true,type:'무기 진화',level:0});}
     let pool=eligible.filter(u=>!exclude.includes(u.id));if(pool.length<3)pool=[...eligible];
     if(!result.length&&this.level<5&&owned.length<this.weaponSlots){const ws=pool.filter(u=>WEAPONS.includes(u.id)&&!this.u[u.id]);if(ws.length)result.push({...ws[Math.floor(this.random()*ws.length)],level:0});}

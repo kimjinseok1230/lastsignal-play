@@ -7,10 +7,10 @@
   <meta name="description" content="편의점의 밤은 고양이들의 시간! 간식을 모으고 청소로봇을 피해 아침까지 살아남는 생존 게임.">
   <title>야근냥 — 간식 회수 근무</title>
   <link rel="icon" href="./assets/cat-runner.webp" type="image/webp">
-  <link rel="stylesheet" href="./style.css?v=cat1">
+  <link rel="stylesheet" href="./style.css?v=cat4">
 
-  <link rel="stylesheet" href="./aim.css?v=cat1">
-  <link rel="stylesheet" href="./cat-theme.css?v=cat3">
+  <link rel="stylesheet" href="./aim.css?v=cat4">
+  <link rel="stylesheet" href="./cat-theme.css?v=cat4">
 </head>
 <body>
   <canvas id="world" aria-label="야근냥 편의점 게임 필드"></canvas>
@@ -34,7 +34,7 @@
       <section class="menu-primary" aria-labelledby="crew-title">
         <div class="crew-heading"><span class="eyebrow">오늘의 야간조</span><span class="crew-badge">고양이 3마리</span></div>
         <h2 id="crew-title">누구랑 출근할까요?</h2><p class="crew-intro">성격도, 특기도 다른 세 친구.</p>
-        <div id="class-picker" class="class-picker" role="group" aria-label="플레이할 고양이 선택"></div>
+        <button id="collection-btn" class="secondary-button collection-entry">고양이 도감 · 해금 / 코인 뽑기</button><div id="class-picker" class="class-picker" role="group" aria-label="플레이할 고양이 선택"></div>
         <p id="class-description" class="class-description" aria-live="polite"></p>
         <div class="start-row"><button id="start-btn" class="primary-button"><span>간식 챙기러 가기</span><span aria-hidden="true">→</span></button><button id="continue-btn" class="secondary-button hidden">이어서 하기</button></div>
         <p class="control-summary">이동 <kbd>WASD</kbd> · 마우스 조준 · 공격은 자동!</p>
@@ -62,6 +62,6 @@
     <div id="overlay" class="overlay hidden"><section id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1"></section></div>
     <div id="save-notice" class="save-notice hidden" role="status">이 브라우저에서는 저장할 수 없습니다. 현재 게임은 계속 플레이할 수 있습니다.</div>
   </div>
-  <script type="module" src="./app.js?v=cat3"></script>
+  <script type="module" src="./app.js?v=cat4"></script>
 </body>
 </html>

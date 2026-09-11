@@ -1,4 +1,4 @@
-import {CLASSES,UPGRADES,EVOLUTIONS,ENEMY_TYPES,RELAY_POSITIONS,DURATION,WORLD,VERSION,xpRequired} from './data.js?v=cat1';
+import {CLASSES,UPGRADES,EVOLUTIONS,ENEMY_TYPES,RELAY_POSITIONS,DURATION,WORLD,VERSION,xpRequired} from './data.js?v=cat4';
 
 const TAU=Math.PI*2;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -43,7 +43,7 @@ export class Game {
     p.x=clamp(p.x,-WORLD+35,WORLD-35);p.y=clamp(p.y,-WORLD+35,WORLD-35);p.hp=Math.min(p.maxHp,p.hp+s.regen*dt);
     while(this.eventIndex<this.events.length&&this.t>=this.events[this.eventIndex].t)this.runEvent(this.events[this.eventIndex++]);
     this.spawnTimer-=dt;
-    if(this.spawnTimer<=0){this.spawnTimer=1/(.95+this.t*.0115)*(this.difficulty? .8:1);if(this.enemies.length<190)this.spawnRandom();}
+    if(this.spawnTimer<=0){this.spawnTimer=1/(.8+this.t*.0095)*(this.difficulty? .8:1);if(this.enemies.length<190)this.spawnRandom();}
     this.spatial=new Map();for(const e of this.enemies){const key=(Math.floor(e.x/96)+40)*100+Math.floor(e.y/96)+40;let bucket=this.spatial.get(key);if(!bucket)this.spatial.set(key,bucket=[]);bucket.push(e);}
     this.updateMain(v);
     if(p.shotCd<-.1)p.shotCd=-.1;
@@ -143,7 +143,7 @@ export class Game {
     }this.loot=this.loot.filter(l=>!l.dead);if(xpGain>0){this.addXp(xpGain*this.stats.xpBonus);if(this.pickupSound<=0){this.sound.play('pickup');this.pickupSound=.16;}}
   }
   addXp(amount){this.xp+=amount;while(this.xp>=xpRequired(this.level)){this.xp-=xpRequired(this.level);this.level++;this.pendingLevels++;}}
-  updateRelays(dt){const p=this.player;let charging=null;for(const r of this.relays){if(r.active||this.t<r.unlock)continue;const d=Math.hypot(p.x-r.x,p.y-r.y);if(d<107){r.charge=Math.min(12,r.charge+dt);charging=r;if(r.charge>=12){r.active=true;this.collected+=35;p.hp=Math.min(p.maxHp,p.hp+35+(this.base.recovery||0)*6);this.pendingLevels++;this.ring(r.x,r.y,400,COLORS.mint,1.2);this.sound.play('relay');this.toast('간식 창고 0'+(r.id+1)+' 열기 · 무료 강화 · 생명력 회복',false,5);for(const e of this.enemies)if(!e.boss&&Math.hypot(e.x-r.x,e.y-r.y)<400)this.damage(e,350*this.stats.power,'relay');}}}this.charging=charging&&!charging.active?charging:null;}
+  updateRelays(dt){const p=this.player;let charging=null;for(const r of this.relays){if(r.active||this.t<r.unlock)continue;const d=Math.hypot(p.x-r.x,p.y-r.y);if(d<107){r.charge=Math.min(10,r.charge+dt);charging=r;if(r.charge>=10){r.active=true;this.collected+=35;p.hp=Math.min(p.maxHp,p.hp+35+(this.base.recovery||0)*6);this.pendingLevels++;this.ring(r.x,r.y,400,COLORS.mint,1.2);this.sound.play('relay');this.toast('간식 창고 0'+(r.id+1)+' 열기 · 무료 강화 · 생명력 회복',false,5);for(const e of this.enemies)if(!e.boss&&Math.hypot(e.x-r.x,e.y-r.y)<400)this.damage(e,350*this.stats.power,'relay');}}}this.charging=charging&&!charging.active?charging:null;}
   getChoices(exclude=[]){
     const pool=UPGRADES.filter(u=>(this.u[u.id]||0)<u.max).map(u=>({...u,level:this.u[u.id]||0}));const evos=EVOLUTIONS.filter(e=>!this.evolved[e.id]&&(this.u[e.weapon]||0)>=5&&(this.u[e.support]||0)>=2).map(e=>({...e,evolution:true,type:'무기 진화',level:0}));
     const selected=[];if(evos.length)selected.push(evos[Math.floor(this.random()*evos.length)]);
@@ -173,7 +173,7 @@ export class Game {
     const dt=Math.min(delta,.05);this.visualTime+=dt;this.frameCount++;const c=this.ctx;if(!c)return;
     const live=this.state==='playing';if(live){for(const f of this.fx){f.life-=dt;if(f.vx!==undefined){f.x+=f.vx*dt;f.y+=f.vy*dt;f.vx*=.94;f.vy*=.94;}}this.fx=this.fx.filter(f=>f.life>0);for(const f of this.texts){f.life-=dt;f.y-=dt*24;}this.texts=this.texts.filter(f=>f.life>0);for(const b of this.beams)b.life-=dt;this.beams=this.beams.filter(b=>b.life>0);}
     this.shake=Math.max(0,this.shake-dt*40);this.flash=Math.max(0,this.flash-dt);
-    if(this.state==='menu'){this.camera.x=-260+Math.sin(this.visualTime*.05)*75;this.camera.y=-150+Math.cos(this.visualTime*.07)*65;}else{const f=1-Math.exp(-dt*8);this.camera.x+=(this.player.x-this.camera.x)*f;this.camera.y+=(this.player.y-this.camera.y)*f;}
+    if(this.state==='menu'){this.camera.x=-260+Math.sin(this.visualTime*.05)*75;this.camera.y=-150+Math.cos(this.visualTime*.07)*65;}else{const f=1-Math.exp(-dt*14);this.camera.x+=(this.player.x-this.camera.x)*f;this.camera.y+=(this.player.y-this.camera.y)*f;}
     c.setTransform(this.dpr,0,0,this.dpr,0,0);c.fillStyle=COLORS.floor;c.fillRect(0,0,this.w,this.h);c.save();const shak=this.settings.shake?this.shake:0;c.translate(this.w/2+(Math.sin(this.visualTime*173)*shak),this.h/2+(Math.cos(this.visualTime*151)*shak));c.scale(this.zoom,this.zoom);c.translate(-this.camera.x,-this.camera.y);
     this.drawFloor(c);this.drawRelays(c);if(this.state==='menu')this.drawDemo(c);else{
       this.drawHazards(c);this.drawLoot(c);this.drawFields(c);for(const e of this.enemies)if(this.visible(e.x,e.y,110))this.drawEnemy(c,e);this.drawBullets(c);this.drawPlayer(c,this.player.x,this.player.y,this.player.angle);this.drawOrbits(c);

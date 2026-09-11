@@ -1,3 +1,4 @@
+import {EXTRA_CATS,collectionMeta} from './roster.js?v=cat4';
 export const VERSION = 1;
 export const EDITION = 2;
 export const DURATION = 900;
@@ -7,6 +8,7 @@ export const CLASSES = [
   {id:'engineer',name:'모찌',en:'MOCHI',icon:'🐈',tag:'깃털 · 주변 방어',description:'느긋해 보여도 준비는 철저해요. 처음부터 깃털 장난감이 주변을 지켜줘요.',hp:135,speed:195,damage:22,interval:.42,dash:3.8,armor:0},
   {id:'warden',name:'후추',en:'PEPPER',icon:'🐈‍⬛',tag:'튼튼함 · 초보 추천',description:'처음 출근한다면 후추와 함께! 높은 체력과 세 갈래 팝콘총으로 든든하게 시작해요.',hp:160,speed:185,damage:16,interval:.64,dash:4.1,armor:2}
 ];
+CLASSES.push(...EXTRA_CATS);
 export const UPGRADES = [
   {id:'power',name:'진한 츄르',icon:'🍯',max:5,desc:'모든 무기 피해량 +18%',type:'출력'},
   {id:'haste',name:'간식 급식기',icon:'🍽️',max:5,desc:'모든 무기 공격 속도 +15%',type:'발사'},
@@ -62,6 +64,6 @@ export const ENEMY_TYPES = {
 };
 export const RELAY_POSITIONS=[{x:-900,y:-620},{x:1000,y:-570},{x:240,y:1110}];
 export function formatTime(n){n=Math.max(0,Math.floor(n));return String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0');}
-export function xpRequired(level){return Math.floor(18+level*8+Math.pow(level,1.75)*4);}
-export function createMeta(){return {version:VERSION,credits:0,base:{},runs:0,wins:0,bestTime:0,bestKills:0,totalKills:0,history:[],settings:{sound:false,volume:.36,shake:true,particles:true}};}
-export function normalizeMeta(raw){const m=createMeta();if(!raw||raw.version!==VERSION)return m;for(const k of ['credits','runs','wins','bestTime','bestKills','totalKills'])m[k]=Number.isFinite(raw[k])?Math.max(0,Math.floor(raw[k])):0;for(const b of BASE_UPGRADES)m.base[b.id]=Math.min(b.max,Math.max(0,Math.floor(Number(raw.base?.[b.id])||0)));if(Array.isArray(raw.history))m.history=raw.history.slice(0,10).filter(x=>x&&CLASSES.some(c=>c.id===x.classId)&&Number.isFinite(x.time)&&Number.isFinite(x.kills)).map(x=>({classId:x.classId,time:Math.max(0,x.time),kills:Math.max(0,x.kills),won:!!x.won}));if(raw.settings){m.settings.sound=!!raw.settings.sound;m.settings.volume=Math.max(0,Math.min(1,Number(raw.settings.volume)||0));m.settings.shake=raw.settings.shake!==false;m.settings.particles=raw.settings.particles!==false;}return m;}
+export function xpRequired(level){return Math.floor(18+level*6+Math.pow(level,1.65)*3);}
+export function createMeta(){return {version:VERSION,credits:0,base:{},runs:0,wins:0,bestTime:0,bestKills:0,totalKills:0,history:[],collection:collectionMeta(),settings:{sound:false,volume:.36,shake:true,particles:true}};}
+export function normalizeMeta(raw){const m=createMeta();if(!raw||raw.version!==VERSION)return m;for(const k of ['credits','runs','wins','bestTime','bestKills','totalKills'])m[k]=Number.isFinite(raw[k])?Math.max(0,Math.floor(raw[k])):0;for(const b of BASE_UPGRADES)m.base[b.id]=Math.min(b.max,Math.max(0,Math.floor(Number(raw.base?.[b.id])||0)));if(Array.isArray(raw.history))m.history=raw.history.slice(0,10).filter(x=>x&&CLASSES.some(c=>c.id===x.classId)&&Number.isFinite(x.time)&&Number.isFinite(x.kills)).map(x=>({classId:x.classId,time:Math.max(0,x.time),kills:Math.max(0,x.kills),won:!!x.won}));m.collection=collectionMeta(raw.collection);if(raw.settings){m.settings.sound=!!raw.settings.sound;m.settings.volume=Math.max(0,Math.min(1,Number(raw.settings.volume)||0));m.settings.shake=raw.settings.shake!==false;m.settings.particles=raw.settings.particles!==false;}return m;}

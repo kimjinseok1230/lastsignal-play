@@ -7,20 +7,21 @@ export const aiming={
   },
   aimScreen(x,y){
     if(this.state!=='playing'||!Number.isFinite(x)||!Number.isFinite(y))return false;
-    this.aim={mode:'pointer',x,y,angle:this.player.angle};this.updateAim();return true;
+    this.aim={mode:'pointer',x,y,angle:this.player.angle};return true;
   },
   aimVector(x,y){
-    if(this.state!=='playing'||!Number.isFinite(x)||!Number.isFinite(y)||Math.hypot(x,y)<.12)return false;
-    this.aim={mode:'direction',angle:Math.atan2(y,x)};this.player.angle=this.aim.angle;return true;
+    if(this.state!=='playing'||!Number.isFinite(x)||!Number.isFinite(y)||Math.hypot(x,y)<.22)return false;
+    this.aim={mode:'direction',angle:Math.atan2(y,x)};return true;
   },
-  updateAim(){
+  updateAim(dt=1/60){
     if(!this.aim)this.resetAim();
     if(this.aim.mode==='pointer'){
       const x=this.camera.x+(this.aim.x-this.w/2)/this.zoom-this.player.x;
       const y=this.camera.y+(this.aim.y-this.h/2)/this.zoom-this.player.y;
-      if(Math.hypot(x,y)>8)this.aim.angle=Math.atan2(y,x);
+      if(Math.hypot(x,y)>48)this.aim.angle=Math.atan2(y,x);
     }
-    this.player.angle=this.aim.angle;
+    const d=diff(this.aim.angle,this.player.angle),step=7.5*dt;
+    this.player.angle+=Math.max(-step,Math.min(step,d));
   },
   updateMain(){
     this.updateAim();const p=this.player;
@@ -61,7 +62,7 @@ export function bindStick(zone,base,knob,onVector,isPlaying){
   zone.addEventListener('pointermove',e=>{
     if(e.pointerId!==pointer)return;if(!isPlaying()){reset();return;}e.preventDefault();
     const dx=e.clientX-origin.x,dy=e.clientY-origin.y,d=Math.hypot(dx,dy)||1,x=dx/d*Math.min(d,40),y=dy/d*Math.min(d,40);
-    knob.style.transform=`translate(${x}px,${y}px)`;onVector(x/40,y/40);
+    knob.style.transform=`translate(${x}px,${y}px)`;const magnitude=Math.hypot(x,y)/40;const strength=magnitude<.16?0:(magnitude-.16)/.84;onVector(x/40/(magnitude||1)*strength,y/40/(magnitude||1)*strength);
   });
   for(const event of ['pointerup','pointercancel','lostpointercapture'])zone.addEventListener(event,e=>{if(e.pointerId===pointer)reset();});
   return reset;

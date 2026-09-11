@@ -1,7 +1,7 @@
-import {EXTRA_CATS} from './roster.js?v=cat5';
-import {SignalGame} from './interference.js?v=cat5';
-import {Game} from './game.js?v=cat5';
-import {WORLD} from './data.js?v=cat5';
+import {EXTRA_CATS} from './roster.js?v=cat6';
+import {SignalGame} from './interference.js?v=cat6';
+import {Game} from './game.js?v=cat6';
+import {WORLD} from './data.js?v=cat6';
 const TAU=Math.PI*2;
 const sprites={};
 if(typeof Image!=='undefined')for(const name of ['cat-runner','cat-engineer','cat-warden','robot-cleaner','robot-toy','robot-boss',...EXTRA_CATS.map(c=>'cat-'+c.id)]){const im=new Image();im.src=new URL('./assets/'+name+'.webp',import.meta.url).href;sprites[name]=im;}

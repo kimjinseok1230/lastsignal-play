@@ -1,8 +1,8 @@
-import {missionUnlocks,buyCat,buyTicket,drawCat,DRAW_COST,TICKET_COST} from './roster.js?v=cat5';
-import {bindStick} from './aim.js?v=cat5';
-import {SignalGame as Game} from './cat-game.js?v=cat5';
-import {Sound} from './audio.js?v=cat5';
-import {CLASSES,UPGRADES,EVOLUTIONS,BASE_UPGRADES,DURATION,WEAPONS,PROTOCOLS,createMeta,normalizeMeta,formatTime,xpRequired} from './data.js?v=cat5';
+import {missionUnlocks,buyCat,buyTicket,drawCat,DRAW_COST,TICKET_COST} from './roster.js?v=cat6';
+import {bindStick} from './aim.js?v=cat6';
+import {SignalGame as Game} from './cat-game.js?v=cat6';
+import {Sound} from './audio.js?v=cat6';
+import {CLASSES,UPGRADES,EVOLUTIONS,BASE_UPGRADES,DURATION,WEAPONS,PROTOCOLS,createMeta,normalizeMeta,formatTime,xpRequired} from './data.js?v=cat6';
 
 const $=id=>document.getElementById(id);
 const STORAGE='night-shift-cats-v1',RUN_STORAGE=STORAGE+'-run';
@@ -41,7 +41,12 @@ async function rewardedRevive(){if(adPending||!game.awaitingRevive||typeof windo
 function menuRefresh(){
   if(game.state==='menu')game.classId=selectedClass;
   $('class-picker').innerHTML=CLASSES.filter(c=>owned(c.id)).map(c=>`<button class="class-card ${c.id===selectedClass?'selected':''}" data-class="${c.id}" aria-pressed="${c.id===selectedClass}"><span class="cat-portrait cat-${c.id}" aria-hidden="true"></span><strong>${c.name}</strong><span class="cat-role">${c.tag}</span><span class="selection-mark" aria-hidden="true">${c.id===selectedClass?"✓":""}</span></button>`).join('');
-  $('class-description').textContent=CLASSES.find(c=>c.id===selectedClass).description;
+  const partner=CLASSES.find(c=>c.id===selectedClass);
+  $('class-description').textContent=partner.description;
+  $('lobby-cat').src='./assets/cat-'+partner.id+'.webp';$('lobby-cat').alt=partner.name;
+  $('lobby-name').textContent=partner.name;$('lobby-weapon').textContent=partner.tag;
+  $('owned-count').textContent='보유 '+meta.collection.owned.length+' / '+CLASSES.length;
+  $('ticket-badge').textContent=meta.collection.tickets;
   $('credits-badge').textContent=meta.credits.toLocaleString();
   $('continue-btn').classList.toggle('hidden',!savedRun);
   $('best-summary').textContent=meta.runs?`최고 ${formatTime(meta.bestTime)} · 퇴근 성공 ${meta.wins}회`:'첫 야간 근무를 시작해 보세요.';
@@ -107,6 +112,7 @@ function updateHUD(force=false){
 }
 
 $('class-picker').addEventListener('click',e=>{const c=e.target.closest('[data-class]');if(c){selectedClass=c.dataset.class;write(STORAGE+'-selected',selectedClass);sound.play('click');menuRefresh();}});
+$('lobby-home').addEventListener('click',()=>{hideModal();menuRefresh();});
 $('start-btn').addEventListener('click',requestStart);
 $('continue-btn').addEventListener('click',continueRun);
 $('collection-btn').addEventListener('click',()=>showCollection());

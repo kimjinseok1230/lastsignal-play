@@ -7,10 +7,11 @@
   <meta name="description" content="편의점의 밤은 고양이들의 시간! 간식을 모으고 청소로봇을 피해 아침까지 살아남는 생존 게임.">
   <title>야근냥 — 간식 회수 근무</title>
   <link rel="icon" href="./assets/cat-runner.webp" type="image/webp">
-  <link rel="stylesheet" href="./style.css?v=cat5">
+  <link rel="stylesheet" href="./style.css?v=cat6">
 
-  <link rel="stylesheet" href="./aim.css?v=cat5">
-  <link rel="stylesheet" href="./cat-theme.css?v=cat5">
+  <link rel="stylesheet" href="./aim.css?v=cat6">
+  <link rel="stylesheet" href="./cat-theme.css?v=cat6">
+  <link rel="stylesheet" href="./app-lobby.css?v=cat6">
 </head>
 <body>
   <canvas id="world" aria-label="야근냥 편의점 게임 필드"></canvas>
@@ -25,22 +26,29 @@
       </div>
     </header>
 
-    <main id="menu" class="menu-screen">
-      <section class="store-stage" aria-labelledby="game-title">
-        <div class="store-heading"><span class="night-label">밤 12시, 편의점 영업 시작!</span><h1 id="game-title">야근냥<span>간식 회수 근무</span></h1><p>사람들은 퇴근했다.<br>이제, 우리 간식을 챙길 시간.</p></div>
-        <img class="store-art" src="./assets/cat-store.webp" alt="간식으로 가득한 밤의 편의점에서 모험을 준비하는 고양이들" width="1536" height="1024" fetchpriority="high">
-        <div class="shift-ticket"><span class="ticket-icon" aria-hidden="true">☾</span><div><strong>오늘의 미션</strong><span>간식 창고 3곳 열기 → 대왕 청소기 물리치기 → 퇴근!</span></div><b>15분<span>생존 도전</span></b></div>
+    <main id="menu" class="menu-screen app-lobby">
+      <div class="lobby-wallet"><span>밤샘 편의점</span><div><span aria-hidden="true">🪙</span> <b id="credits-badge">0</b><span class="wallet-divider">|</span><span aria-hidden="true">🎟️</span> <b id="ticket-badge">2</b></div></div>
+      <section class="lobby-stage" aria-labelledby="game-title">
+        <img class="lobby-backdrop" src="./assets/cat-store.webp" alt="밤의 편의점" fetchpriority="high">
+        <div class="lobby-stage-title"><span class="lobby-status">야간 영업 중</span><h1 id="game-title">오늘도, 야근냥</h1></div>
+        <img id="lobby-cat" class="lobby-cat" src="./assets/cat-runner.webp" alt="치즈">
+        <div class="lobby-cat-label"><strong id="lobby-name">치즈</strong><span id="lobby-weapon">빠른 발 · 츄르총</span></div>
+        <button id="guide-btn" class="lobby-help" aria-label="조작 안내">?</button>
       </section>
-      <section class="menu-primary" aria-labelledby="crew-title">
-        <div class="crew-heading"><span class="eyebrow">오늘의 야간조</span><span class="crew-badge">고양이 3마리</span></div>
-        <h2 id="crew-title">누구랑 출근할까요?</h2><p class="crew-intro">성격도, 특기도 다른 세 친구.</p>
-        <button id="collection-btn" class="secondary-button collection-entry">고양이 도감 · 해금 / 코인 뽑기</button><div id="class-picker" class="class-picker" role="group" aria-label="플레이할 고양이 선택"></div>
+      <section class="lobby-controls" aria-labelledby="crew-title">
+        <div class="lobby-section-title"><h2 id="crew-title">오늘의 파트너</h2><span id="owned-count">보유 3 / 12</span></div>
+        <div id="class-picker" class="class-picker" role="group" aria-label="플레이할 고양이 선택"></div>
         <p id="class-description" class="class-description" aria-live="polite"></p>
-        <div class="start-row"><button id="start-btn" class="primary-button"><span>간식 챙기러 가기</span><span aria-hidden="true">→</span></button><button id="continue-btn" class="secondary-button hidden">이어서 하기</button></div>
-        <p class="control-summary">이동 <kbd>WASD</kbd> · 마우스 조준 · 공격은 자동!</p>
-        <nav class="menu-links" aria-label="편의점 메뉴"><button id="base-btn"><span class="nav-emoji" aria-hidden="true">🏠</span><strong>우리 아지트</strong><span class="nav-detail">간식 코인 <b id="credits-badge">0</b></span></button><button id="guide-btn"><span class="nav-emoji" aria-hidden="true">📖</span><strong>초보 집사 안내</strong><span class="nav-detail">조작과 생존 팁</span></button><button id="records-btn"><span class="nav-emoji" aria-hidden="true">🏅</span><strong>근무 일지</strong><span class="nav-detail">나의 최고 기록</span></button></nav>
-        <footer class="menu-footer"><span id="best-summary">첫 야간 근무를 시작해 보세요.</span><span>야근냥 <b>v0.1</b></span></footer>
+        <div class="lobby-mission"><span aria-hidden="true">🥫</span><div><strong>간식 회수 작전</strong><small>창고 3곳 · 대왕 청소기 · 무사 퇴근</small></div><b>15분</b></div>
+        <div class="start-row"><button id="start-btn" class="primary-button"><span>플레이</span><span aria-hidden="true">▶</span></button><button id="continue-btn" class="secondary-button hidden">이어서 하기</button></div>
+        <p id="best-summary" class="lobby-record">첫 야간 근무를 시작해 보세요.</p>
       </section>
+      <nav class="menu-links lobby-tabs" aria-label="하단 메뉴">
+        <button id="lobby-home" class="active" aria-label="홈"><span aria-hidden="true">⌂</span><strong>홈</strong></button>
+        <button id="collection-btn"><span aria-hidden="true">🐱</span><strong>고양이</strong></button>
+        <button id="base-btn"><span aria-hidden="true">🛍️</span><strong>아지트</strong></button>
+        <button id="records-btn"><span aria-hidden="true">🏆</span><strong>기록</strong></button>
+      </nav>
     </main>
 
     <section id="hud" class="hud hidden" aria-label="게임 상태">
@@ -62,6 +70,6 @@
     <div id="overlay" class="overlay hidden"><section id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1"></section></div>
     <div id="save-notice" class="save-notice hidden" role="status">이 브라우저에서는 저장할 수 없습니다. 현재 게임은 계속 플레이할 수 있습니다.</div>
   </div>
-  <script type="module" src="./app.js?v=cat5"></script>
+  <script type="module" src="./app.js?v=cat6"></script>
 </body>
 </html>

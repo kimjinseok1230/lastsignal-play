@@ -1,5 +1,5 @@
-import {ACTIVE_SKILLS} from './roster.js?v=cat11';
-import {WORLD} from './data.js?v=cat11';
+import {ACTIVE_SKILLS} from './roster.js?v=cat12';
+import {WORLD} from './data.js?v=cat12';
 const TAU=Math.PI*2,dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y),clamp=n=>Math.max(-WORLD+25,Math.min(WORLD-25,n));
 export const catSkills={
  resetCatSkills(){this.skillObjects=[];this.skillBuff=null;this.evoTimers={};},
@@ -25,7 +25,7 @@ export const catSkills={
  updateCatSkills(dt){const p=this.player;if(this.skillBuff){const b=this.skillBuff;b.life-=dt;if(b.kind==='sprint'){b.tick-=dt;if(b.tick<=0){b.tick=.3;this.traps.push({x:p.x,y:p.y,age:0,life:1.1,arm:.6,damage:30*this.stats.power,r:65,echo:true});}}if(b.life<=0){this.skillBuff=null;this.recalculate();}}
   for(const z of this.skillObjects){z.life-=dt;z.tick-=dt;
    if(z.kind==='flame'||z.kind==='satellites'){z.x=p.x;z.y=p.y;z.angle=p.angle;z.phase=(z.phase||0)+dt*1.6;}
-   if(z.kind==='charge'){const e=this.enemies.find(e=>e.id===z.targetId&&!e.dead);if(!e){z.life=0;continue;}z.x=e.x;z.y=e.y;if(z.life<=0){this.damage(e,110*this.stats.power,'arc');for(const n of this.enemies)if(n!==e&&!n.dead&&dist(n,e)<85)this.damage(n,45*this.stats.power,'arc');this.ring(e.x,e.y,85,z.color,.35);this.sound.play('arc');}continue;}
+   if(z.kind==='charge'){const e=this.enemies.find(e=>e.id===z.targetId&&!e.dead);if(!e){z.life=0;continue;}z.x=e.x;z.y=e.y;if(z.life<=0){this.damage(e,110*this.stats.power,'arc');for(const n of this.enemies)if(n!==e&&!n.dead&&dist(n,e)<85)this.damage(n,45*this.stats.power,'arc');this.ring(e.x,e.y,85,z.color,.35);this.sound.play('arc');if(this.evolved.tesla)this.evolutionBurst?.(e.x,e.y,100,'#ffed8c',true);}continue;}
    if(z.life<=0||z.tick>0)continue;z.tick=z.kind==='flame'?.2:z.kind==='turret'?.45:.5;
    if(z.kind==='turret'||z.kind==='satellites'){const n=this.nearest(z,460);if(n){const count=z.kind==='turret'?1:3;for(let i=0;i<count;i++){const a=z.phase+i*TAU/3,sx=z.kind==='turret'?z.x:z.x+Math.cos(a)*z.r,sy=z.kind==='turret'?z.y:z.y+Math.sin(a)*z.r;this.skillShot(sx,sy,Math.atan2(n.y-sy,n.x-sx),z.kind==='turret'?'pierce':'stars',this.stats.damage*.8);}this.sound.play(z.kind==='turret'?'weapon-engineer':'weapon-stars');}}
    if(z.kind==='flame')this.sound.play('weapon-flame');
@@ -37,7 +37,7 @@ export const catSkills={
   if(id==='aegis'){const i=this.hostile.findIndex(b=>dist(b,p)<155);if(i>=0){const b=this.hostile.splice(i,1)[0];this.ring(b.x,b.y,24,'#baffdf',.2);this.evoTimers[id]=.35;}}
   if(id==='tesla'){this.evoTimers[id]=4;const n=this.nearest(p,480);if(n){this.skillObjects.push({kind:'charge',x:n.x,y:n.y,targetId:n.id,r:28,life:.8,max:.8,tick:0,color:'#fff39e'});}}
   if(id==='blizzard'){this.evoTimers[id]=2.5;for(let i=0;i<8;i++)this.skillShot(p.x,p.y,i*TAU/8,'freeze',30*s.power,420);}
-  if(id==='crossbeam'){this.evoTimers[id]=4;const n=this.nearest(p,550);if(n)for(const a of [0,Math.PI/2]){const dx=Math.cos(a)*230,dy=Math.sin(a)*230;this.fx.push({kind:'rail',x:n.x-dx,y:n.y-dy,tx:n.x+dx,ty:n.y+dy,life:.3,max:.3,color:'#fff1a3'});for(const e of this.enemies)if(!e.dead&&e.warmup<=0&&Math.abs((e.x-n.x)*Math.sin(a)-(e.y-n.y)*Math.cos(a))<e.r+10&&dist(e,n)<230)this.damage(e,65*s.power,'rail');}}
+  if(id==='crossbeam'){this.evoTimers[id]=4;const n=this.nearest(p,550);if(n)for(const a of [0,Math.PI/2]){const dx=Math.cos(a)*230,dy=Math.sin(a)*230;this.fx.push({kind:'rail',x:n.x-dx,y:n.y-dy,tx:n.x+dx,ty:n.y+dy,life:.3,max:.3,color:'#fff1a3',evo:true,final:true});for(const e of this.enemies)if(!e.dead&&e.warmup<=0&&Math.abs((e.x-n.x)*Math.sin(a)-(e.y-n.y)*Math.cos(a))<e.r+10&&dist(e,n)<230)this.damage(e,65*s.power,'rail');}}
   if(id==='garden'){this.evoTimers[id]=5;for(let i=0;i<3;i++){const a=p.angle+(i-1)*.7;this.traps.push({x:clamp(p.x+Math.cos(a)*150),y:clamp(p.y+Math.sin(a)*150),age:0,life:6,arm:1,r:100,damage:95*s.power});}}
  }},
  drawCatSkills(c){c.save();for(const z of this.skillObjects){c.strokeStyle=z.color;c.fillStyle=z.color+'18';c.lineWidth=2;c.beginPath();if(z.kind==='flame'){c.moveTo(z.x,z.y);c.arc(z.x,z.y,z.r,(z.angle||0)-.72,(z.angle||0)+.72);c.closePath();}else c.arc(z.x,z.y,z.r,0,TAU);c.fill();c.stroke();

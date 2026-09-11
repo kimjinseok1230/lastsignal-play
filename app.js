@@ -1,8 +1,8 @@
-import {missionUnlocks,buyCat,buyTicket,drawCat,DRAW_COST,TICKET_COST} from './roster.js?v=cat4';
-import {bindStick} from './aim.js?v=cat4';
-import {SignalGame as Game} from './cat-game.js?v=cat4';
-import {Sound} from './audio.js?v=cat4';
-import {CLASSES,UPGRADES,EVOLUTIONS,BASE_UPGRADES,DURATION,WEAPONS,PROTOCOLS,createMeta,normalizeMeta,formatTime,xpRequired} from './data.js?v=cat4';
+import {missionUnlocks,buyCat,buyTicket,drawCat,DRAW_COST,TICKET_COST} from './roster.js?v=cat5';
+import {bindStick} from './aim.js?v=cat5';
+import {SignalGame as Game} from './cat-game.js?v=cat5';
+import {Sound} from './audio.js?v=cat5';
+import {CLASSES,UPGRADES,EVOLUTIONS,BASE_UPGRADES,DURATION,WEAPONS,PROTOCOLS,createMeta,normalizeMeta,formatTime,xpRequired} from './data.js?v=cat5';
 
 const $=id=>document.getElementById(id);
 const STORAGE='night-shift-cats-v1',RUN_STORAGE=STORAGE+'-run';
@@ -11,7 +11,7 @@ function read(key){try{const raw=localStorage.getItem(key);return raw?JSON.parse
 function write(key,value){try{if(value===null)localStorage.removeItem(key);else localStorage.setItem(key,JSON.stringify(value));}catch{if(storageOK){storageOK=false;$('save-notice').classList.remove('hidden');setTimeout(()=>$('save-notice').classList.add('hidden'),6500);}}}
 const meta=normalizeMeta(read(STORAGE));
 missionUnlocks(meta);
-let savedRun=read(RUN_STORAGE),selectedClass='runner',modalClose=null,toastTimer=null,lastDock='',lastObjective='',lastHud=0,lastMini=0,menuModal='',result=null,priorFocus=null;
+let savedRun=read(RUN_STORAGE),selectedClass=meta.collection.owned.includes(read(STORAGE+'-selected'))?read(STORAGE+'-selected'):'runner',modalClose=null,toastTimer=null,lastDock='',lastObjective='',lastHud=0,lastMini=0,menuModal='',result=null,priorFocus=null;
 const sound=new Sound(meta.settings);
 const game=new Game($('world'),{
   start:()=>{resetControls();$('menu').classList.add('hidden');$('hud').classList.remove('hidden');$('pause-btn').classList.remove('hidden');document.body.classList.add('playing');hideModal();lastDock='';lastObjective='';updateHUD(true);},
@@ -35,7 +35,7 @@ function showCollection(message=''){
  openModal(`${closeButton}<div class="eyebrow">고양이 도감 ${meta.collection.owned.length} / ${CLASSES.length}</div><h2 id="modal-title">야간조를 모아 보세요</h2><p class="modal-intro">간식 코인 ${meta.credits} · 부활권 ${meta.collection.tickets}장</p>${message?`<p class="collection-message" role="status">${message}</p>`:''}<div class="collection-actions"><button class="primary-button" data-action="draw-cat" ${meta.credits<DRAW_COST?'disabled':''}>코인 뽑기 · ${DRAW_COST}</button><button class="secondary-button" data-action="buy-ticket" ${meta.credits<TICKET_COST?'disabled':''}>부활권 1장 · ${TICKET_COST} 코인</button></div><p class="upgrade-note">셰프냥 30% · 번개냥 30% · 별빛냥 25% · 우주냥 15%<br>중복은 45코인 반환. 신규 없이 9회 뽑으면 다음은 미보유 고양이 확정 (${Math.min(9,meta.collection.pity)}/9). 확정 뽑기는 미보유 고양이의 기존 가중치 비율로 추첨합니다. 모두 모으면 확정 보장은 종료됩니다.</p><div class="collection-grid">${CLASSES.map(c=>{const has=owned(c.id),secret=c.unlock==='secret'&&!has;const label=has?'보유 중':c.unlock==='coin'?`${c.cost} 코인`:c.unlock==='gacha'?'코인 뽑기':c.unlock==='secret'?'시크릿 미션':c.hint;const progress=c.mission==='kills'?meta.totalKills:c.mission==='time'?meta.bestTime:meta.wins;return `<article class="collection-card ${has?'':'locked'}"><img src="./assets/cat-${c.id}.webp" alt="${has?c.name:'잠긴 고양이 실루엣'}"><h3>${secret?'???':c.name}</h3><p>${secret?'무사 퇴근 뒤 모습을 드러내요.':c.description}</p><small>${label}${c.mission&&!has?` · ${Math.min(progress,c.target)}/${c.target}${c.mission==='time'?'초':''}`:''}</small>${has?`<button data-select-cat="${c.id}" class="secondary-button">${selectedClass===c.id?'선택됨':'함께 출근'}</button>`:c.unlock==='coin'?`<button data-buy-cat="${c.id}" class="secondary-button" ${meta.credits<c.cost?'disabled':''}>코인으로 해금</button>`:''}</article>`;}).join('')}</div><p class="upgrade-note">코인과 수집 기록은 이 브라우저에 저장됩니다. 현금 결제는 없습니다. 부활권은 한 판에 1회, 체력 60%와 3초 무적으로 부활합니다.</p>`,hideModal);
 }
 let adPending=false;
-function showRevive(){resetControls();saveRun();const adReady=typeof window.CatRewardedAds?.show==='function';openModal(`<div class="eyebrow">한 번 더 도전</div><h2 id="modal-title">다시 일어날까요?</h2><p class="modal-intro">체력 60% 회복 · 3초 무적 · 주변 적 밀어내기<br>한 판에 부활 1회</p><div class="modal-bottom"><button class="primary-button" data-action="revive-ticket" ${meta.collection.tickets<1?'disabled':''}>부활권 사용 (${meta.collection.tickets}장)</button><button class="secondary-button" data-action="revive-ad" ${!adReady?'disabled':''}>${adReady?'광고 보고 부활':'광고 부활 · 준비 중'}</button></div><p id="revive-message" class="upgrade-note" role="status">${adReady?'광고 시청 완료 후에만 부활합니다.':'광고 서비스 연결 전입니다. 부활권으로 계속할 수 있어요.'}</p><button class="quiet-button" data-action="accept-death">이번 근무 마치기</button>`);}
+function showRevive(){resetControls();saveRun();const adReady=typeof window.CatRewardedAds?.show==='function';openModal(`<div class="eyebrow">한 번 더 도전</div><h2 id="modal-title">다시 일어날까요?</h2><p class="modal-intro">체력 60% 회복 · 3초 무적 · 주변 적 밀어내기<br>한 판에 부활 1회</p><div class="modal-bottom"><button class="primary-button" data-action="revive-ticket" ${meta.collection.tickets<1?'disabled':''}>부활권 사용 (${meta.collection.tickets}장)</button>${adReady?'<button class="secondary-button" data-action="revive-ad">광고 보고 부활</button>':''}</div><p id="revive-message" class="upgrade-note" role="status">${adReady?'광고 시청 완료 후에만 부활합니다.':'부활권은 고양이 도감에서 코인으로 구매할 수 있어요.'}</p><button class="quiet-button" data-action="accept-death">이번 근무 마치기</button>`);}
 async function rewardedRevive(){if(adPending||!game.awaitingRevive||typeof window.CatRewardedAds?.show!=='function')return;adPending=true;document.querySelectorAll('[data-action^="revive"],[data-action="accept-death"]').forEach(b=>b.disabled=true);try{const reward=await window.CatRewardedAds.show({placement:'revive',runId:game.runId});if(reward?.completed===true&&game.awaitingRevive)game.revive();else{$('revive-message').textContent='시청이 완료되지 않았습니다. 부활권을 사용하거나 다시 시도할 수 있어요.';}}catch{$('revive-message').textContent='광고를 불러오지 못했습니다. 부활권은 차감되지 않았어요.';}finally{adPending=false;if(game.awaitingRevive){document.querySelector('[data-action="revive-ad"]').disabled=false;document.querySelector('[data-action="accept-death"]').disabled=false;document.querySelector('[data-action="revive-ticket"]').disabled=meta.collection.tickets<1;}}}
 
 function menuRefresh(){
@@ -106,7 +106,7 @@ function updateHUD(force=false){
   const dock=JSON.stringify([game.u,game.evolved,game.protocol]);if(force||dock!==lastDock){lastDock=dock;const weapons=UPGRADES.filter(u=>WEAPONS.includes(u.id)&&game.u[u.id]);$('weapon-dock').innerHTML=`<div class="weapon-chip" title="${game.classData.weapon||(game.classId==='warden'?'팝콘총':'츄르총')} · 마우스 조준 / 자동 연사"><span class="weapon-icon">⌁</span><small>기본</small></div>`+weapons.map(u=>{const evolved=EVOLUTIONS.find(e=>e.weapon===u.id&&game.evolved[e.id]);return `<div class="weapon-chip" style="--skill-color:${skillColor(u)}" title="${evolved?evolved.name:u.name}"><span class="weapon-icon" ${evolved?'style="color:var(--accent)"':''}>${evolved?evolved.icon:u.icon}</span><small>${evolved?'진화':'LV.'+game.u[u.id]}</small></div>`;}).join('')+Array.from({length:Math.max(0,game.weaponSlots-weapons.length)},()=>'<div class="weapon-chip empty"><span class="weapon-icon">＋</span><small>빈자리</small></div>').join('');}
 }
 
-$('class-picker').addEventListener('click',e=>{const c=e.target.closest('[data-class]');if(c){selectedClass=c.dataset.class;sound.play('click');menuRefresh();}});
+$('class-picker').addEventListener('click',e=>{const c=e.target.closest('[data-class]');if(c){selectedClass=c.dataset.class;write(STORAGE+'-selected',selectedClass);sound.play('click');menuRefresh();}});
 $('start-btn').addEventListener('click',requestStart);
 $('continue-btn').addEventListener('click',continueRun);
 $('collection-btn').addEventListener('click',()=>showCollection());
@@ -125,7 +125,7 @@ $('sound-btn').addEventListener('click',()=>{sound.unlock();meta.settings.sound=
 $('fullscreen-btn').addEventListener('click',async()=>{try{if(document.fullscreenElement){await document.exitFullscreen();}else if(document.documentElement.requestFullscreen)await document.documentElement.requestFullscreen();}catch{game.toast('이 브라우저에서는 전체 화면을 사용할 수 없습니다.',false,3);}});
 if(!document.documentElement.requestFullscreen)$('fullscreen-btn').classList.add('hidden');
 $('modal').addEventListener('click',e=>{
-  const select=e.target.closest('[data-select-cat]');if(select&&owned(select.dataset.selectCat)){selectedClass=select.dataset.selectCat;hideModal();menuRefresh();return;}
+  const select=e.target.closest('[data-select-cat]');if(select&&owned(select.dataset.selectCat)){selectedClass=select.dataset.selectCat;write(STORAGE+'-selected',selectedClass);hideModal();menuRefresh();return;}
   const purchase=e.target.closest('[data-buy-cat]');if(purchase&&!purchase.disabled){if(buyCat(meta,purchase.dataset.buyCat)){saveMeta();menuRefresh();showCollection('새 고양이가 합류했어요!');}return;}
   const upgrade=e.target.closest('[data-upgrade]');if(upgrade){game.choose(upgrade.dataset.upgrade);return;}
   const base=e.target.closest('[data-base]');if(base&&!base.disabled){const u=BASE_UPGRADES.find(u=>u.id===base.dataset.base);const n=meta.base[u.id]||0,cost=u.cost*(n+1);if(n<u.max&&meta.credits>=cost){meta.credits-=cost;meta.base[u.id]=n+1;saveMeta();sound.play('level');menuRefresh();showBase();}return;}

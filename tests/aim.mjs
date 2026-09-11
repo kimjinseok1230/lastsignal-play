@@ -19,3 +19,10 @@ test('Rail and launched rockets follow aim; target acquisition ignores enemies b
 function surface(){const handlers=new Map(),captured=new Set();return {style:{},classList:{add(){},remove(){}},addEventListener(n,fn){handlers.set(n,fn);},setPointerCapture(id){captured.add(id);},hasPointerCapture:id=>captured.has(id),releasePointerCapture:id=>captured.delete(id),getBoundingClientRect:()=>({left:0,top:0}),emit(n,id,x,y){handlers.get(n)?.({pointerType:'touch',pointerId:id,clientX:x,clientY:y,preventDefault(){}});}};}
 test('Two thumbs remain independent; cancellation clears movement and preserves aim',()=>{const left=surface(),right=surface();let movement={x:0,y:0},aim={x:0,y:-1};const reset=bindStick(left,surface(),surface(),(x,y)=>movement={x,y},()=>true);bindStick(right,surface(),surface(),(x,y)=>{if(x||y)aim={x,y};},()=>true);left.emit('pointerdown',1,50,50);right.emit('pointerdown',2,250,50);left.emit('pointermove',1,90,50);right.emit('pointermove',2,250,10);close(movement.x,1);close(aim.y,-1);left.emit('pointerup',2,0,0);close(movement.x,1);right.emit('pointerup',2,0,0);close(aim.y,-1);left.emit('pointercancel',1,0,0);close(movement.x,0);reset();});
 console.log(JSON.stringify({tests:results.length,passed:results},null,2));
+// Dragging far must not require dragging all the way back to the initial touch point.
+{
+ const z=surface();let move={x:0,y:0};bindStick(z,surface(),surface(),(x,y)=>move={x,y},()=>true);
+ z.emit('pointerdown',1,0,0);z.emit('pointermove',1,200,0);close(move.x,1);
+ z.emit('pointermove',1,150,0);assert(move.x<0,'floating origin reverses immediately');
+ z.emit('pointerup',1,150,0);close(move.x,0);
+}

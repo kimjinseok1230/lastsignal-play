@@ -46,3 +46,19 @@ html,body{background:var(--bg);color:var(--text)}body:not(.playing){overflow:aut
 .cat-astro{background-image:url(./assets/cat-astro.webp);background-size:contain;background-position:center;background-repeat:no-repeat}
 .cat-moon{background-image:url(./assets/cat-moon.webp);background-size:contain;background-position:center;background-repeat:no-repeat}
 .playing .modal{--text:#243256;--muted:#69738a;--accent:#db5523;--mint:#3157bb;color:#243256;color-scheme:light}
+
+/* Explicit anchors prevent the old centered dock from stretching across the touch controls. */
+.playing .ability-dock{left:auto;right:24px;bottom:24px;transform:none;width:auto}
+@media(max-width:800px),(pointer:coarse){
+ .playing .ability-dock{left:auto;right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom));width:auto;transform:none}
+ .playing .touch-zone,.playing .aim-zone{bottom:90px!important;height:clamp(150px,32vh,270px)!important;width:46%!important}
+ .playing .touch-zone{left:0}.playing .aim-zone{right:0}
+ .playing .signal-hud{bottom:77px;left:12px;right:auto;transform:none;width:176px;pointer-events:none}
+ .playing .weapon-dock{bottom:max(12px,env(safe-area-inset-bottom))}
+ .playing .stats-hud{pointer-events:none}
+ .playing .ability{touch-action:manipulation;min-width:48px}
+}
+@media(max-height:520px) and (min-width:600px){
+ .playing .touch-zone,.playing .aim-zone{bottom:82px!important;height:42vh!important;width:36%!important}
+ .playing .signal-hud{bottom:15px;left:50%;right:auto;transform:translateX(-50%);width:200px}
+}

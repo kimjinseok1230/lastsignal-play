@@ -57,11 +57,12 @@ export function bindStick(zone,base,knob,onVector,isPlaying){
   zone.addEventListener('pointerdown',e=>{
     if(!isPlaying()||pointer!==null||e.pointerType==='mouse')return;
     e.preventDefault();pointer=e.pointerId;origin={x:e.clientX,y:e.clientY};zone.setPointerCapture(pointer);zone.classList.add('active');
-    const rect=zone.getBoundingClientRect();base.style.left=(e.clientX-rect.left-50)+'px';base.style.top=(e.clientY-rect.top-50)+'px';base.style.bottom='auto';
+    const rect=zone.getBoundingClientRect(),half=(base.getBoundingClientRect?.().width||100)/2;base.style.left=(e.clientX-rect.left-half)+'px';base.style.top=(e.clientY-rect.top-half)+'px';base.style.bottom='auto';
   });
   zone.addEventListener('pointermove',e=>{
     if(e.pointerId!==pointer)return;if(!isPlaying()){reset();return;}e.preventDefault();
     const dx=e.clientX-origin.x,dy=e.clientY-origin.y,d=Math.hypot(dx,dy)||1,x=dx/d*Math.min(d,40),y=dy/d*Math.min(d,40);
+    if(d>40){origin={x:e.clientX-x,y:e.clientY-y};const rect=zone.getBoundingClientRect(),half=(base.getBoundingClientRect?.().width||100)/2;base.style.left=(origin.x-rect.left-half)+'px';base.style.top=(origin.y-rect.top-half)+'px';}
     knob.style.transform=`translate(${x}px,${y}px)`;const magnitude=Math.hypot(x,y)/40;const strength=magnitude<.16?0:(magnitude-.16)/.84;onVector(x/40/(magnitude||1)*strength,y/40/(magnitude||1)*strength);
   });
   for(const event of ['pointerup','pointercancel','lostpointercapture'])zone.addEventListener(event,e=>{if(e.pointerId===pointer)reset();});

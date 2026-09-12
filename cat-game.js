@@ -1,9 +1,10 @@
-import {evolutionFX} from './evolution-fx.js?v=cat12';
-import {catSkills} from './cat-skills.js?v=cat12';
-import {EXTRA_CATS,ACTIVE_SKILLS} from './roster.js?v=cat12';
-import {SignalGame} from './interference.js?v=cat12';
-import {Game} from './game.js?v=cat12';
-import {WORLD,EVOLUTIONS} from './data.js?v=cat12';
+import {zoneFX} from './zone-fx.js?v=cat14';
+import {evolutionFX} from './evolution-fx.js?v=cat14';
+import {catSkills} from './cat-skills.js?v=cat14';
+import {EXTRA_CATS,ACTIVE_SKILLS} from './roster.js?v=cat14';
+import {SignalGame} from './interference.js?v=cat14';
+import {Game} from './game.js?v=cat14';
+import {WORLD,EVOLUTIONS} from './data.js?v=cat14';
 const TAU=Math.PI*2;
 const sprites={};
 if(typeof Image!=='undefined')for(const name of ['cat-runner','cat-engineer','cat-warden','robot-cleaner','robot-toy','robot-boss',...EXTRA_CATS.map(c=>'cat-'+c.id)]){const im=new Image();im.src=new URL('./assets/'+name+'.webp',import.meta.url).href;sprites[name]=im;}
@@ -21,7 +22,7 @@ export class CatGame extends SignalGame{
   updateEnemy(e,dt){if(e.root>0){e.root=Math.max(0,e.root-dt);e.exposed=Math.max(0,(e.exposed||0)-dt);e.slow=Math.max(0,(e.slow||0)-dt);return;}super.updateEnemy(e,dt);}
   drawEffects(c){this.drawCatSkills(c);super.drawEffects(c);this.drawEvolutionEffects(c);}
   drawOrbits(c){super.drawOrbits(c);this.drawEvolutionOrbits(c);}
-  drawFields(c){super.drawFields(c);this.drawEvolutionFields(c);}
+  drawFields(c){super.drawFields(c);this.drawEvolutionFields(c);this.drawIceZone(c);this.drawWebZones(c);}
   applyUpgrade(id){const fresh=!this.evolved[id];super.applyUpgrade(id);const e=EVOLUTIONS.find(e=>e.id===id);if(e&&fresh)this.celebrateEvolution(e);}
   updateTraps(dt){const old=this.traps.filter(t=>!t.echo&&t.life>0);super.updateTraps(dt);if(this.evolved.singularity)for(const t of old)if(t.life<=0)this.evolutionBurst(t.x,t.y,t.r,'#d8a2ff',!!this.evolved.garden);}
 
@@ -47,10 +48,11 @@ export class CatGame extends SignalGame{
     c.fillStyle='#080f17';if(left<-WORLD)c.fillRect(left,top,-WORLD-left,height);if(left+width>WORLD)c.fillRect(WORLD,top,left+width-WORLD,height);if(top<-WORLD)c.fillRect(left,top,width,-WORLD-top);if(top+height>WORLD)c.fillRect(left,WORLD,width,top+height-WORLD);c.restore();
   }
   drawPlayer(c,x,y,a){this.drawAim(c,x,y,a);c.save();const p=this.player;const moving=Math.hypot(p.moveX||0,p.moveY||0)>0&&(this.keys.size>0||Math.hypot(this.touch.x,this.touch.y)>0);if(p.invuln>0&&Math.floor(this.visualTime*15)%2)c.globalAlpha=.5;const bob=moving?Math.sin(this.visualTime*17)*2:Math.sin(this.visualTime*3)*.7;c.strokeStyle='#92e8d0';c.lineWidth=1.5;c.beginPath();c.ellipse(x,y+12,23,11,0,0,TAU);c.stroke();c.fillStyle='#00000088';c.beginPath();c.ellipse(x,y+11,16,7,0,0,TAU);c.fill();if(Math.cos(a)>.25)this.catFacingLeft=false;else if(Math.cos(a)<-.25)this.catFacingLeft=true;if(!sprite(c,'cat-'+(this.classId||'runner'),x,y+bob,54,!!this.catFacingLeft))emoji(c,'🐱',x,y,35);if(this.overdrive>0){c.strokeStyle='#e49530';c.lineWidth=3;c.beginPath();c.arc(x,y,34,0,TAU);c.stroke();}c.restore();}
-  drawEnemy(c,e){c.save();if(e.warmup>0)c.globalAlpha=.4;if(e.flash>0)c.globalAlpha=.65;const boss=e.boss||['final','sentinel','elite','brute'].includes(e.type);const name=boss?'robot-boss':['spitter','sniper','jammer','splitter'].includes(e.type)?'robot-toy':'robot-cleaner';c.fillStyle='#00000088';c.beginPath();c.ellipse(e.x,e.y+e.r*.65,e.r*.9,e.r*.3,0,0,TAU);c.fill();if(!sprite(c,name,e.x,e.y,Math.max(26,e.r*2.7),Math.cos(e.angle)<0))emoji(c,'🤖',e.x,e.y,e.r*2);if(e.shielded){c.strokeStyle='#a782c9';c.lineWidth=3;c.beginPath();c.arc(e.x,e.y,e.r+9,0,TAU);c.stroke();}if(e.chill>0){c.strokeStyle='#58a7c5';c.lineWidth=2;c.beginPath();c.arc(e.x,e.y,e.r+5,0,TAU);c.stroke();}if(e.hp<e.maxHp){c.fillStyle='#271c2a';c.fillRect(e.x-e.r,e.y-e.r-20,e.r*2,4);c.fillStyle='#ff788d';c.fillRect(e.x-e.r,e.y-e.r-20,e.r*2*Math.max(0,e.hp/e.maxHp),4);}c.restore();}
+  drawEnemy(c,e){this.drawCatEnemy(c,e);this.drawEnemyStatus(c,e);}
+  drawCatEnemy(c,e){c.save();if(e.warmup>0)c.globalAlpha=.4;if(e.flash>0)c.globalAlpha=.65;const boss=e.boss||['final','sentinel','elite','brute'].includes(e.type);const name=boss?'robot-boss':['spitter','sniper','jammer','splitter'].includes(e.type)?'robot-toy':'robot-cleaner';c.fillStyle='#00000088';c.beginPath();c.ellipse(e.x,e.y+e.r*.65,e.r*.9,e.r*.3,0,0,TAU);c.fill();if(!sprite(c,name,e.x,e.y,Math.max(26,e.r*2.7),Math.cos(e.angle)<0))emoji(c,'🤖',e.x,e.y,e.r*2);if(e.shielded){c.strokeStyle='#a782c9';c.lineWidth=3;c.beginPath();c.arc(e.x,e.y,e.r+9,0,TAU);c.stroke();}if(e.chill>0){c.strokeStyle='#58a7c5';c.lineWidth=2;c.beginPath();c.arc(e.x,e.y,e.r+5,0,TAU);c.stroke();}if(e.hp<e.maxHp){c.fillStyle='#271c2a';c.fillRect(e.x-e.r,e.y-e.r-20,e.r*2,4);c.fillStyle='#ff788d';c.fillRect(e.x-e.r,e.y-e.r-20,e.r*2*Math.max(0,e.hp/e.maxHp),4);}c.restore();}
   drawDrone(c,x,y,a){c.save();c.translate(x,y);c.rotate(a);emoji(c,'🪶',0,0,27);c.restore();}
   drawRelays(c){for(const r of this.relays){if(!this.visible(r.x,r.y,170))continue;const open=this.t>=r.unlock,color=r.active?'#8df2cc':open?'#ffd18a':'#8494ac';c.save();c.globalAlpha=open||r.active?1:.5;c.fillStyle=r.active?'#79b99122':'#e0a65520';c.strokeStyle=color;c.lineWidth=3;c.beginPath();c.arc(r.x,r.y,107,0,TAU);c.fill();c.stroke();if(r.charge>0){c.lineWidth=6;c.beginPath();c.arc(r.x,r.y,112,-Math.PI/2,-Math.PI/2+TAU*r.charge/10);c.stroke();}emoji(c,r.active?'🍱':'📦',r.x,r.y,51);c.font='700 16px sans-serif';c.textAlign='center';c.fillStyle=color;c.fillText('간식 창고 '+(r.id+1),r.x,r.y-130);c.font='14px sans-serif';if(r.active)c.fillText('회수 완료',r.x,r.y+139);c.restore();}}
   drawLoot(c){for(const l of this.loot){if(!this.visible(l.x,l.y,24))continue;if(l.type==='xp'){c.fillStyle=l.value>20?'#ffe29a':'#a7efce';c.strokeStyle='#d9ffe8';c.lineWidth=1;c.beginPath();c.arc(l.x,l.y,l.value>20?6:4,0,TAU);c.fill();c.stroke();}else emoji(c,l.type==='med'?'🥛':l.type==='magnet'?'🧲':'🍪',l.x,l.y+Math.sin(this.visualTime*3)*2,24);}}
 }
-Object.assign(CatGame.prototype,catSkills,evolutionFX);
+Object.assign(CatGame.prototype,catSkills,evolutionFX,zoneFX);
 export {CatGame as SignalGame};

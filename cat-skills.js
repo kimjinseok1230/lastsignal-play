@@ -1,5 +1,5 @@
-import {ACTIVE_SKILLS} from './roster.js?v=cat12';
-import {WORLD} from './data.js?v=cat12';
+import {ACTIVE_SKILLS} from './roster.js?v=cat14';
+import {WORLD} from './data.js?v=cat14';
 const TAU=Math.PI*2,dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y),clamp=n=>Math.max(-WORLD+25,Math.min(WORLD-25,n));
 export const catSkills={
  resetCatSkills(){this.skillObjects=[];this.skillBuff=null;this.evoTimers={};},
@@ -40,7 +40,7 @@ export const catSkills={
   if(id==='crossbeam'){this.evoTimers[id]=4;const n=this.nearest(p,550);if(n)for(const a of [0,Math.PI/2]){const dx=Math.cos(a)*230,dy=Math.sin(a)*230;this.fx.push({kind:'rail',x:n.x-dx,y:n.y-dy,tx:n.x+dx,ty:n.y+dy,life:.3,max:.3,color:'#fff1a3',evo:true,final:true});for(const e of this.enemies)if(!e.dead&&e.warmup<=0&&Math.abs((e.x-n.x)*Math.sin(a)-(e.y-n.y)*Math.cos(a))<e.r+10&&dist(e,n)<230)this.damage(e,65*s.power,'rail');}}
   if(id==='garden'){this.evoTimers[id]=5;for(let i=0;i<3;i++){const a=p.angle+(i-1)*.7;this.traps.push({x:clamp(p.x+Math.cos(a)*150),y:clamp(p.y+Math.sin(a)*150),age:0,life:6,arm:1,r:100,damage:95*s.power});}}
  }},
- drawCatSkills(c){c.save();for(const z of this.skillObjects){c.strokeStyle=z.color;c.fillStyle=z.color+'18';c.lineWidth=2;c.beginPath();if(z.kind==='flame'){c.moveTo(z.x,z.y);c.arc(z.x,z.y,z.r,(z.angle||0)-.72,(z.angle||0)+.72);c.closePath();}else c.arc(z.x,z.y,z.r,0,TAU);c.fill();c.stroke();
+ drawCatSkills(c){c.save();for(const z of this.skillObjects){if(z.kind==='web')continue;c.strokeStyle=z.color;c.fillStyle=z.color+'18';c.lineWidth=2;c.beginPath();if(z.kind==='flame'){c.moveTo(z.x,z.y);c.arc(z.x,z.y,z.r,(z.angle||0)-.72,(z.angle||0)+.72);c.closePath();}else c.arc(z.x,z.y,z.r,0,TAU);c.fill();c.stroke();
   if(z.kind==='web')for(let i=0;i<8;i++){c.beginPath();c.moveTo(z.x,z.y);c.lineTo(z.x+Math.cos(i*TAU/8)*z.r,z.y+Math.sin(i*TAU/8)*z.r);c.stroke();}
   if(z.kind==='turret')this.drawDrone(c,z.x,z.y,this.visualTime);
   if(z.kind==='satellites')for(let i=0;i<3;i++){const a=z.phase+i*TAU/3;this.drawDrone(c,z.x+Math.cos(a)*z.r,z.y+Math.sin(a)*z.r,a);}

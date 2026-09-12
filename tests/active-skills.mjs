@@ -1,8 +1,8 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {CatGame} from '../cat-game.js?v=cat12';
-import {createMeta} from '../data.js?v=cat12';
-import {ACTIVE_SKILLS} from '../roster.js?v=cat12';
+import {CatGame} from '../cat-game.js?v=cat14';
+import {createMeta} from '../data.js?v=cat14';
+import {ACTIVE_SKILLS} from '../roster.js?v=cat14';
 function make(id){const g=new CatGame({getContext:()=>null},{},{play(){},ambient(){}},{particles:true,shake:false});g.start(id,createMeta());g.enemies=[];g.player.angle=0;g.player.invuln=0;g.player.hp=30;for(const x of [90,-90]){const e=g.spawnEnemy('brute',x,0);e.warmup=0;e.hp=e.maxHp=10000;}return g;}
 test('12 active skills enforce cooldown, pause gate and retain cooldown on restore',()=>{for(const id of Object.keys(ACTIVE_SKILLS)){const g=make(id);g.state='paused';assert.equal(g.pulse(),false);g.state='playing';assert(g.pulse());assert.equal(g.pulse(),false);assert.equal(g.player.pulseCd,ACTIVE_SKILLS[id].cd);const h=make('runner');assert(h.restore(JSON.parse(JSON.stringify(g.serialize()))));assert.equal(h.player.pulseCd,g.player.pulseCd);}});
 test('active skills change movement, install allies, protect or control enemies',()=>{

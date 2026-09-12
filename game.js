@@ -1,4 +1,4 @@
-import {CLASSES,UPGRADES,EVOLUTIONS,ENEMY_TYPES,RELAY_POSITIONS,DURATION,WORLD,VERSION,xpRequired} from './data.js?v=cat17';
+import {CLASSES,UPGRADES,EVOLUTIONS,ENEMY_TYPES,RELAY_POSITIONS,DURATION,WORLD,VERSION,xpRequired} from './data.js?v=cat18';
 
 const TAU=Math.PI*2;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));

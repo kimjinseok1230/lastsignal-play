@@ -40,8 +40,8 @@ test('Jammer protects neighbors; rail bypasses it; cold and lightning shatter ne
 test('Mines arm before firing, pull their targets, and evolve into lasting gravity wells',()=>{
   const g=make();g.applyUpgrade('mine');g.evolved.singularity=true;g.mineTimer=0;g.updateWeapons(.01);const trap=g.traps[0],e=enemy(g,'brute',trap.x+45,trap.y);e.hp=e.maxHp=1000;g.updateTraps(.3);assert.equal(e.hp,1000);const dx=Math.abs(e.x-trap.x);g.updateTraps(.5);assert(e.hp<1000);assert(Math.abs(e.x-trap.x)<dx);assert(g.wells.length>0);assert.equal(g.traps.length,0);
 });
-test('Boss transitions retain attacks at each health phase',()=>{
-  const g=make();const boss=enemy(g,'sentinel',500,0);g.updateEnemy(boss,.01);boss.hp=boss.maxHp*.6;boss.burstCd=0;g.updateEnemy(boss,.01);assert.equal(boss.bossStage,1);assert(g.hostile.length>0);boss.hp=boss.maxHp*.3;boss.patternCd=0;g.updateEnemy(boss,.01);assert.equal(boss.bossStage,2);assert(boss.exposed>0);assert(g.lines.length+g.waves.length+g.hazards.length>0);
+test('Boss transitions retain readable charge attacks at each phase',()=>{
+ const g=make(),boss=enemy(g,'sentinel',300,0);boss.hp=boss.maxHp*.6;boss.patternCd=0;g.updateEnemy(boss,.01);assert.equal(boss.bossStage,1);assert(boss.dashWait>1);assert(g.lines.length);for(let i=0;i<190;i++)g.updateEnemy(boss,.01);assert(boss.exposed>0);boss.hp=boss.maxHp*.3;boss.patternCd=0;g.updateEnemy(boss,.01);assert.equal(boss.bossStage,2);assert(boss.dashWait>0);
 });
 test('Recovery waits for breathing room and taking a hit breaks a chain',()=>{
   const g=make();g.applyUpgrade('regen');g.combo=25;g.player.hp=90;g.hitPlayer(10);assert.equal(g.combo,0);const hp=g.player.hp;for(let i=0;i<120;i++)g.update(1/60);assert.equal(g.player.hp,hp);g.t=6;g.update(1/60);assert(g.player.hp>hp);
@@ -50,7 +50,7 @@ test('New saves preserve mutation choices, active patterns, resonance and trap t
   const g=make();g.level=8;g.pendingLevels=1;g.levelUp();g.addLine(0,0,100,0);g.addWave(0,0,120,.5);g.resonance=88;g.railTimer=.25;const data=JSON.parse(JSON.stringify(g.serialize())),h=make();assert(h.restore(data));assert.deepEqual(h.choiceSet.map(c=>c.id),g.choiceSet.map(c=>c.id));assert.equal(h.lines.length,1);assert.equal(h.waves.length,1);assert.equal(h.railTimer,.25);assert.equal(h.resonance,88);h.choose('glass');assert.equal(h.protocol,'glass');
 });
 test('Legacy saves keep all four old weapons and resume boss attacks; permanent progress survives',()=>{
-  const old=make(LegacyGame);for(const id of ['orbit','arc','field','rocket'])old.applyUpgrade(id);old.t=350;const boss=enemy(old,'sentinel',500,0);old.pendingLevels=0;const data=JSON.parse(JSON.stringify(old.serialize()));const g=make();assert(g.restore(data));assert.equal(g.weaponSlots,4);assert.equal(WEAPONS.filter(id=>g.u[id]).length,4);const restored=g.enemies.find(e=>e.id===boss.id);for(let i=0;i<250;i++)g.updateEnemy(restored,1/60);assert(g.hostile.length>0);assert(Number.isFinite(restored.patternCd));assert(g.nextInterference>old.t);
+  const old=make(LegacyGame);for(const id of ['orbit','arc','field','rocket'])old.applyUpgrade(id);old.t=350;const boss=enemy(old,'sentinel',500,0);old.pendingLevels=0;const data=JSON.parse(JSON.stringify(old.serialize()));const g=make();assert(g.restore(data));assert.equal(g.weaponSlots,4);assert.equal(WEAPONS.filter(id=>g.u[id]).length,4);const restored=g.enemies.find(e=>e.id===boss.id);for(let i=0;i<250;i++)g.updateEnemy(restored,1/60);assert(g.lines.length>0);assert(Number.isFinite(restored.patternCd));assert(g.nextInterference>old.t);
   const meta=createMeta();meta.credits=175;meta.base.hull=3;meta.wins=2;const normalized=normalizeMeta(JSON.parse(JSON.stringify(meta)));assert.equal(normalized.credits,175);assert.equal(normalized.base.hull,3);assert.equal(normalized.wins,2);
 });
 console.log(JSON.stringify({tests:results.length,passed:results},null,2));

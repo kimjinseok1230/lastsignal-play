@@ -1,7 +1,8 @@
-import {TestGame} from './test-game.js?v=3';
-import {CLASSES,WEAPONS,UPGRADES,EVOLUTIONS,formatTime} from './data.js?v=cat15';
-import {ACTIVE_SKILLS} from './roster.js?v=cat15';
-import {Sound} from './audio.js?v=cat15';
+import {endingScene} from './ending-scene.js?v=1';
+import {TestGame} from './test-game.js?v=4';
+import {CLASSES,WEAPONS,UPGRADES,EVOLUTIONS,formatTime} from './data.js?v=cat16';
+import {ACTIVE_SKILLS} from './roster.js?v=cat16';
+import {Sound} from './audio.js?v=cat16';
 const $=id=>document.getElementById(id),settings={sound:true,volume:.36,musicVolume:.4,effectsVolume:.8,particles:true,shake:true},sound=new Sound(settings);
 let toastUntil=0;const g=new TestGame($('world'),{toast:message=>{$('notice').textContent=message;toastUntil=performance.now()+2400;}},sound,settings);
 $('cat').innerHTML=CLASSES.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');$('weapon').innerHTML='<option value="none">전용 스킬만 테스트</option>'+WEAPONS.map(id=>`<option value="${id}">${UPGRADES.find(u=>u.id===id).name}</option>`).join('');$('weapon').value='orbit';
@@ -20,3 +21,7 @@ const pointers=new Map(),canvas=$('world');canvas.onpointerdown=e=>{canvas.focus
 window.addEventListener('blur',()=>{g.keys.clear();g.touch={x:0,y:0};pointers.clear();if(g.state==='playing')g.pause();});
 new ResizeObserver(()=>{const r=canvas.getBoundingClientRect();g.resize(r.width,r.height,devicePixelRatio||1);}).observe(canvas);
 start();let last=performance.now();function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;g.update(dt);g.render(dt);sound.setMode(g.state);$('pause').textContent=g.state==='playing'?'일시정지':'계속';$('stats').textContent=`테스트 · ${formatTime(g.t)} · HP ${Math.ceil(g.player.hp)}/${g.player.maxHp} · 적 ${g.enemies.length} · 처치 ${g.kills}`;if(now>toastUntil)$('notice').textContent='';requestAnimationFrame(frame);}requestAnimationFrame(frame);
+
+let previewStep=0;const previewData={classId:'runner',relays:3,bossKills:3,kills:500,bestCombo:50,credits:300};
+function drawEndingPreview(){previewData.classId=g.classId;$('ending-content').innerHTML='<p>테스트 미리보기 · 아래 성과는 예시이며 보상이 지급되지 않습니다.</p>'+endingScene(previewData,previewStep,2,'장난감 진화 장인');}
+$('ending-preview').onclick=()=>{if(g.state==='playing')g.pause();previewStep=0;drawEndingPreview();$('ending-dialog').showModal();};$('ending-close').onclick=()=>$('ending-dialog').close();$('ending-content').onclick=e=>{const a=e.target.closest('[data-action]')?.dataset.action;if(a==='ending-next'&&previewStep<2){previewStep++;drawEndingPreview();}else if(a)$('ending-dialog').close();};

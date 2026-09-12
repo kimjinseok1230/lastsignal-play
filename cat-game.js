@@ -1,10 +1,11 @@
-import {zoneFX} from './zone-fx.js?v=cat15';
-import {evolutionFX} from './evolution-fx.js?v=cat15';
-import {catSkills} from './cat-skills.js?v=cat15';
-import {EXTRA_CATS,ACTIVE_SKILLS} from './roster.js?v=cat15';
-import {SignalGame} from './interference.js?v=cat15';
-import {Game} from './game.js?v=cat15';
-import {WORLD,EVOLUTIONS} from './data.js?v=cat15';
+import {catBosses,bossProfile} from './cat-bosses.js?v=cat16';
+import {zoneFX} from './zone-fx.js?v=cat16';
+import {evolutionFX} from './evolution-fx.js?v=cat16';
+import {catSkills} from './cat-skills.js?v=cat16';
+import {EXTRA_CATS,ACTIVE_SKILLS} from './roster.js?v=cat16';
+import {SignalGame} from './interference.js?v=cat16';
+import {Game} from './game.js?v=cat16';
+import {WORLD,EVOLUTIONS} from './data.js?v=cat16';
 const TAU=Math.PI*2;
 const sprites={};
 if(typeof Image!=='undefined')for(const name of ['cat-runner','cat-engineer','cat-warden','robot-cleaner','robot-toy','robot-boss',...EXTRA_CATS.map(c=>'cat-'+c.id)]){const im=new Image();im.src=new URL('./assets/'+name+'.webp',import.meta.url).href;sprites[name]=im;}
@@ -17,12 +18,12 @@ export class CatGame extends SignalGame{
   spawnEnemy(...args){const toy=['spitter','sniper','jammer','splitter'];const limited=toy.includes(args[0])&&!this.manualSpawns;if(limited){const cap=this.t<600?4:6;if(this.t<(this.nextToySpawn||0)||this.enemies.filter(e=>!e.dead&&toy.includes(e.type)).length>=cap)return null;}const e=super.spawnEnemy(...args);if(e&&limited)this.nextToySpawn=this.t+(this.t<600?6:4.5);if(e&&!this.difficulty){const ramp=Math.min(1,this.t/600),hp=e.boss?.9:.82+.18*ramp;e.hp*=hp;e.maxHp*=hp;e.damage*=.78+.22*ramp;e.speed*=.92+.08*ramp;}return e;}
   recalculate(){super.recalculate();this.stats.pulseCd*= (ACTIVE_SKILLS[this.classId]?.cd||19)/19;if(this.skillBuff?.kind==='sprint')this.stats.speed*=1.6;if(this.classId==='nurse')this.stats.regen+=.6;if(this.classId==='wizard')this.stats.xpBonus*=1.15;if(this.classId==='astro')this.stats.pickup*=1.4;}
   dash(){const ok=super.dash();if(ok&&this.classId==='ninja')this.ninjaUntil=this.t+2;return ok;}
-  hitPlayer(amount){if(this.player.invuln>0||this.state!=='playing')return;if(this.skillBuff?.kind==='guard'&&this.skillBuff.shield>0){const block=Math.min(amount,this.skillBuff.shield);this.skillBuff.shield-=block;amount-=block;const e=this.nearest(this.player,260);if(e){this.beams.push({x:this.player.x,y:this.player.y,tx:e.x,ty:e.y,life:.2,max:.2,color:'#ffe4a4'});this.damage(e,block*2,'pulse');}if(amount<=0)return;}if(this.classId==='warden'){this.passiveHits=(this.passiveHits||0)+1;if(this.passiveHits%3===0){amount*=.5;this.ring(this.player.x,this.player.y,42,'#ffdd9a',.35);}}super.hitPlayer(amount);}
+  hitPlayer(amount){if(this.player.invuln>0||this.state!=='playing')return;if(this.skillBuff?.kind==='guard'&&this.skillBuff.shield>0){const block=Math.min(amount,this.skillBuff.shield);this.skillBuff.shield-=block;this.skillBuff.flash=.25;amount-=block;const e=this.nearest(this.player,260);if(e){this.beams.push({x:this.player.x,y:this.player.y,tx:e.x,ty:e.y,life:.2,max:.2,color:'#ffe4a4'});this.damage(e,block*2,'pulse');}if(amount<=0)return;}if(this.classId==='warden'){this.passiveHits=(this.passiveHits||0)+1;if(this.passiveHits%3===0){amount*=.5;this.ring(this.player.x,this.player.y,42,'#ffdd9a',.35);}}super.hitPlayer(amount);}
   pulse(){return this.activateCatSkill();}
-  updateEnemy(e,dt){if(e.root>0){e.root=Math.max(0,e.root-dt);e.exposed=Math.max(0,(e.exposed||0)-dt);e.slow=Math.max(0,(e.slow||0)-dt);return;}super.updateEnemy(e,dt);}
-  drawEffects(c){this.drawCatSkills(c);super.drawEffects(c);this.drawEvolutionEffects(c);}
+  updateEnemy(e,dt){if(e.root>0){e.root=Math.max(0,e.root-dt);e.exposed=Math.max(0,(e.exposed||0)-dt);e.slow=Math.max(0,(e.slow||0)-dt);return;}if(e.boss){this.updateCatBoss(e,dt);return;}super.updateEnemy(e,dt);}
+  drawEffects(c){this.drawCatSkills(c);super.drawEffects(c);this.drawEvolutionEffects(c);this.drawGuardShield(c);}
   drawOrbits(c){super.drawOrbits(c);this.drawEvolutionOrbits(c);}
-  drawFields(c){super.drawFields(c);this.drawEvolutionFields(c);this.drawIceZone(c);this.drawWebZones(c);}
+  drawFields(c){super.drawFields(c);this.drawEvolutionFields(c);this.drawIceZone(c);this.drawWebZones(c);this.drawSupportZones(c);}
   applyUpgrade(id){const fresh=!this.evolved[id];super.applyUpgrade(id);const e=EVOLUTIONS.find(e=>e.id===id);if(e&&fresh)this.celebrateEvolution(e);}
   updateTraps(dt){const old=this.traps.filter(t=>!t.echo&&t.life>0);super.updateTraps(dt);if(this.evolved.singularity)for(const t of old)if(t.life<=0)this.evolutionBurst(t.x,t.y,t.r,'#d8a2ff',!!this.evolved.garden);}
 
@@ -48,11 +49,11 @@ export class CatGame extends SignalGame{
     c.fillStyle='#080f17';if(left<-WORLD)c.fillRect(left,top,-WORLD-left,height);if(left+width>WORLD)c.fillRect(WORLD,top,left+width-WORLD,height);if(top<-WORLD)c.fillRect(left,top,width,-WORLD-top);if(top+height>WORLD)c.fillRect(left,WORLD,width,top+height-WORLD);c.restore();
   }
   drawPlayer(c,x,y,a){this.drawAim(c,x,y,a);c.save();const p=this.player;const moving=Math.hypot(p.moveX||0,p.moveY||0)>0&&(this.keys.size>0||Math.hypot(this.touch.x,this.touch.y)>0);if(p.invuln>0&&Math.floor(this.visualTime*15)%2)c.globalAlpha=.5;const bob=moving?Math.sin(this.visualTime*17)*2:Math.sin(this.visualTime*3)*.7;c.strokeStyle='#92e8d0';c.lineWidth=1.5;c.beginPath();c.ellipse(x,y+12,23,11,0,0,TAU);c.stroke();c.fillStyle='#00000088';c.beginPath();c.ellipse(x,y+11,16,7,0,0,TAU);c.fill();if(Math.cos(a)>.25)this.catFacingLeft=false;else if(Math.cos(a)<-.25)this.catFacingLeft=true;if(!sprite(c,'cat-'+(this.classId||'runner'),x,y+bob,54,!!this.catFacingLeft))emoji(c,'🐱',x,y,35);if(this.overdrive>0){c.strokeStyle='#e49530';c.lineWidth=3;c.beginPath();c.arc(x,y,34,0,TAU);c.stroke();}c.restore();}
-  drawEnemy(c,e){this.drawCatEnemy(c,e);this.drawEnemyStatus(c,e);}
-  drawCatEnemy(c,e){c.save();if(e.warmup>0)c.globalAlpha=.4;if(e.flash>0)c.globalAlpha=.65;const boss=e.boss||['final','sentinel','elite','brute'].includes(e.type);const name=boss?'robot-boss':['spitter','sniper','jammer','splitter'].includes(e.type)?'robot-toy':'robot-cleaner';c.fillStyle='#00000088';c.beginPath();c.ellipse(e.x,e.y+e.r*.65,e.r*.9,e.r*.3,0,0,TAU);c.fill();if(!sprite(c,name,e.x,e.y,Math.max(26,e.r*2.7),Math.cos(e.angle)<0))emoji(c,'🤖',e.x,e.y,e.r*2);if(e.shielded){c.strokeStyle='#a782c9';c.lineWidth=3;c.beginPath();c.arc(e.x,e.y,e.r+9,0,TAU);c.stroke();}if(e.chill>0){c.strokeStyle='#58a7c5';c.lineWidth=2;c.beginPath();c.arc(e.x,e.y,e.r+5,0,TAU);c.stroke();}if(e.hp<e.maxHp){c.fillStyle='#271c2a';c.fillRect(e.x-e.r,e.y-e.r-20,e.r*2,4);c.fillStyle='#ff788d';c.fillRect(e.x-e.r,e.y-e.r-20,e.r*2*Math.max(0,e.hp/e.maxHp),4);}c.restore();}
+  drawEnemy(c,e){this.drawCatEnemy(c,e);this.drawEnemyStatus(c,e);if(e.boss){const b=bossProfile(e);c.save();c.strokeStyle=b.color;c.lineWidth=3;c.beginPath();c.arc(e.x,e.y,e.r+12,-Math.PI/2,-Math.PI/2+Math.PI*2*e.hp/e.maxHp);c.stroke();c.restore();}}
+  drawCatEnemy(c,e){c.save();if(e.warmup>0)c.globalAlpha=.4;if(e.flash>0)c.globalAlpha=.65;const boss=e.boss||['final','sentinel','elite','brute'].includes(e.type);const name=e.boss?bossProfile(e).sprite:boss?'robot-boss':['spitter','sniper','jammer','splitter'].includes(e.type)?'robot-toy':'robot-cleaner';c.fillStyle='#00000088';c.beginPath();c.ellipse(e.x,e.y+e.r*.65,e.r*.9,e.r*.3,0,0,TAU);c.fill();if(!sprite(c,name,e.x,e.y,Math.max(26,e.r*2.7),Math.cos(e.angle)<0))emoji(c,'🤖',e.x,e.y,e.r*2);if(e.shielded){c.strokeStyle='#a782c9';c.lineWidth=3;c.beginPath();c.arc(e.x,e.y,e.r+9,0,TAU);c.stroke();}if(e.chill>0){c.strokeStyle='#58a7c5';c.lineWidth=2;c.beginPath();c.arc(e.x,e.y,e.r+5,0,TAU);c.stroke();}if(e.hp<e.maxHp){c.fillStyle='#271c2a';c.fillRect(e.x-e.r,e.y-e.r-20,e.r*2,4);c.fillStyle='#ff788d';c.fillRect(e.x-e.r,e.y-e.r-20,e.r*2*Math.max(0,e.hp/e.maxHp),4);}c.restore();}
   drawDrone(c,x,y,a){c.save();c.translate(x,y);c.rotate(a);emoji(c,'🪶',0,0,27);c.restore();}
   drawRelays(c){for(const r of this.relays){if(!this.visible(r.x,r.y,170))continue;const open=this.t>=r.unlock,color=r.active?'#8df2cc':open?'#ffd18a':'#8494ac';c.save();c.globalAlpha=open||r.active?1:.5;c.fillStyle=r.active?'#79b99122':'#e0a65520';c.strokeStyle=color;c.lineWidth=3;c.beginPath();c.arc(r.x,r.y,107,0,TAU);c.fill();c.stroke();if(r.charge>0){c.lineWidth=6;c.beginPath();c.arc(r.x,r.y,112,-Math.PI/2,-Math.PI/2+TAU*r.charge/10);c.stroke();}emoji(c,r.active?'🍱':'📦',r.x,r.y,51);c.font='700 16px sans-serif';c.textAlign='center';c.fillStyle=color;c.fillText('간식 창고 '+(r.id+1),r.x,r.y-130);c.font='14px sans-serif';if(r.active)c.fillText('회수 완료',r.x,r.y+139);c.restore();}}
   drawLoot(c){for(const l of this.loot){if(!this.visible(l.x,l.y,24))continue;if(l.type==='xp'){c.fillStyle=l.value>20?'#ffe29a':'#a7efce';c.strokeStyle='#d9ffe8';c.lineWidth=1;c.beginPath();c.arc(l.x,l.y,l.value>20?6:4,0,TAU);c.fill();c.stroke();}else emoji(c,l.type==='med'?'🥛':l.type==='magnet'?'🧲':'🍪',l.x,l.y+Math.sin(this.visualTime*3)*2,24);}}
 }
-Object.assign(CatGame.prototype,catSkills,evolutionFX,zoneFX);
+Object.assign(CatGame.prototype,catSkills,evolutionFX,zoneFX,catBosses);
 export {CatGame as SignalGame};

@@ -1,4 +1,4 @@
-import {CLASSES,UPGRADES,EVOLUTIONS,ENEMY_TYPES,RELAY_POSITIONS,DURATION,WORLD,VERSION,xpRequired} from './data.js?v=cat15';
+import {CLASSES,UPGRADES,EVOLUTIONS,ENEMY_TYPES,RELAY_POSITIONS,DURATION,WORLD,VERSION,xpRequired} from './data.js?v=cat16';
 
 const TAU=Math.PI*2;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -65,8 +65,8 @@ export class Game {
     if(event.type==='relay')this.toast('간식 창고 0'+(event.id+1)+' 간식 발견. 지도와 방향 표시를 따라가세요.',false,7);
     if(event.type==='swarm'){this.toast('이상 파동 감지 · 군집이 접근합니다.',true,5);for(let i=0;i<24;i++)if(this.enemies.length<200)this.spawnEnemy(i%4===0?'charger':'skitter');}
     if(event.type==='elite'){this.spawnEnemy('elite',undefined,undefined,{tier:Math.round(event.t/150)});this.toast('대형 장난감 접근 · 처치하면 간식 봉지를 얻습니다.',true,5);this.sound.play('boss');}
-    if(event.type==='boss'){this.spawnEnemy('sentinel',undefined,undefined,{tier:event.tier});this.toast(event.tier===1?'첫 번째 청소로봇가 깨어났습니다.':'점보 청소기가 접근합니다.',true,6);this.sound.play('boss');}
-    if(event.type==='final'){this.spawnEnemy('final',undefined,undefined,{tier:1});this.toast('대왕 청소기 · 대왕 청소기',true,7);this.sound.play('boss');}
+    if(event.type==='boss'){this.spawnEnemy('sentinel',undefined,undefined,{tier:event.tier});this.toast(event.tier===1?'청소반장 돌돌이 · 돌진 예고선을 피하세요.':'냉장고지기 프로스티 · 냉기 포위를 벗어나세요.',true,6);this.sound.play('boss');}
+    if(event.type==='final'){this.spawnEnemy('final',undefined,undefined,{tier:1});this.toast('야간점장 오버클린 · 마지막 근무 시작',true,7);this.sound.play('boss');}
     if(event.type==='evac')this.toast(this.relays.every(r=>r.active)&&this.finalDead?'퇴근 준비 완료. 중앙의 원 안에서 5초간 버티세요.':'문 열릴 시간. 간식 창고 3개와 대왕 청소기를 확인하세요.',false,8);
   }
   spawnRandom(){const q=this.random(),t=this.t;let type='stalker';if(t>45&&q<.2)type='skitter';if(t>100&&q>.78)type='brute';if(t>175&&q>.55&&q<.68)type='spitter';if(t>250&&q>.38&&q<.51)type='charger';if(t>380&&q>.68&&q<.78)type='splitter';this.spawnEnemy(type);}

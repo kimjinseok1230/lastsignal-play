@@ -1,8 +1,10 @@
-import {missionUnlocks,buyCat,buyTicket,drawCat,DRAW_COST,TICKET_COST,PASSIVES,ACTIVE_SKILLS} from './roster.js?v=cat15';
-import {bindStick} from './aim.js?v=cat15';
-import {SignalGame as Game} from './cat-game.js?v=cat15';
-import {Sound} from './audio.js?v=cat15';
-import {CLASSES,UPGRADES,EVOLUTIONS,BASE_UPGRADES,DURATION,WEAPONS,PROTOCOLS,createMeta,normalizeMeta,formatTime,xpRequired} from './data.js?v=cat15';
+import {endingScene} from './ending-scene.js?v=1';
+import {bossProfile} from './cat-bosses.js?v=cat16';
+import {missionUnlocks,buyCat,buyTicket,drawCat,DRAW_COST,TICKET_COST,PASSIVES,ACTIVE_SKILLS} from './roster.js?v=cat16';
+import {bindStick} from './aim.js?v=cat16';
+import {SignalGame as Game} from './cat-game.js?v=cat16';
+import {Sound} from './audio.js?v=cat16';
+import {CLASSES,UPGRADES,EVOLUTIONS,BASE_UPGRADES,DURATION,WEAPONS,PROTOCOLS,createMeta,normalizeMeta,formatTime,xpRequired} from './data.js?v=cat16';
 
 const $=id=>document.getElementById(id);
 const STORAGE='night-shift-cats-v1',RUN_STORAGE=STORAGE+'-run';
@@ -78,7 +80,13 @@ function finishRun(data){sound.setMode('ended');
   resetControls();
   if(meta.collection.settled.includes(data.runId))return;meta.collection.settled.push(data.runId);meta.collection.settled=meta.collection.settled.slice(-100);
   result=data;meta.runs++;meta.wins+=data.won?1:0;meta.credits+=data.credits;meta.bestTime=Math.max(meta.bestTime,Math.floor(data.time));meta.bestKills=Math.max(meta.bestKills,data.kills);meta.totalKills+=data.kills;meta.history.unshift({classId:data.classId,time:Math.floor(data.time),kills:data.kills,won:data.won});meta.history=meta.history.slice(0,10);savedRun=null;write(RUN_STORAGE,null);const unlocked=missionUnlocks(meta);if(data.won)meta.collection.tickets++;saveMeta();updateHUD(true);
-  openModal(`<div class="eyebrow">${data.won?'퇴근 성공':'수고했어, 오늘도'}</div><h2 id="modal-title" class="display-heading">${data.won?'오늘도<br>무사 퇴근!':'오늘은<br><span style="color:var(--accent)">조기 퇴근!</span>'}</h2><p class="result-label">${data.won?'간식도 챙기고, 무사히 퇴근했어요!':'오늘은 여기까지. 아지트에서 쉬었다 다시 와요.'}</p><div class="pause-grid"><div class="pause-stat"><b>${formatTime(data.time)}</b><span>생존 시간</span></div><div class="pause-stat"><b>${data.kills.toLocaleString()}</b><span>격파</span></div><div class="pause-stat"><b>LV. ${data.level}</b><span>도달 레벨</span></div></div>${unlocked.length?`<p class="unlock-message">새 고양이 해금: ${unlocked.map(c=>c.name).join(", ")}</p>`:""}${data.won?'<p class="unlock-message">무사 퇴근 보상 · 부활권 +1</p>':''}<div class="result-credit"><span>회수한 간식 코인 · 우리 아지트에 사용</span><strong>+${data.credits.toLocaleString()}</strong></div><p class="upgrade-note">최대 ${data.bestCombo||0} 연속 처치 · 사뿐 회피 ${data.perfectDodges||0}회 · 우다다 ${data.overdriveCount||0}회</p><p class="upgrade-note">간식 창고 ${data.relays}/3 · 청소로봇 ${data.bossKills}기 격파 · 보유 간식 코인 ${meta.credits.toLocaleString()}</p>${data.won&&meta.wins===1?'<p class="unlock-message">주말 야간조이 열렸습니다. 우리 아지트에서 더 어려운 근무에 도전할 수 있습니다.</p>':''}<div class="modal-bottom"><button class="primary-button" data-action="retry"><span>한 번 더 출근하기</span><span>↗</span></button><button class="secondary-button" data-action="result-base">우리 아지트</button></div><button class="quiet-button" data-action="menu">메뉴로 돌아가기</button>`);
+  const resultHTML=`<div class="eyebrow">${data.won?'퇴근 성공':'수고했어, 오늘도'}</div><h2 id="modal-title" class="display-heading">${data.won?'오늘도<br>무사 퇴근!':'오늘은<br><span style="color:var(--accent)">조기 퇴근!</span>'}</h2><p class="result-label">${data.won?'간식도 챙기고, 무사히 퇴근했어요!':'오늘은 여기까지. 아지트에서 쉬었다 다시 와요.'}</p><div class="pause-grid"><div class="pause-stat"><b>${formatTime(data.time)}</b><span>생존 시간</span></div><div class="pause-stat"><b>${data.kills.toLocaleString()}</b><span>격파</span></div><div class="pause-stat"><b>LV. ${data.level}</b><span>도달 레벨</span></div></div>${unlocked.length?`<p class="unlock-message">새 고양이 해금: ${unlocked.map(c=>c.name).join(", ")}</p>`:""}${data.won?'<p class="unlock-message">무사 퇴근 보상 · 부활권 +1</p>':''}<div class="result-credit"><span>회수한 간식 코인 · 우리 아지트에 사용</span><strong>+${data.credits.toLocaleString()}</strong></div><p class="upgrade-note">최대 ${data.bestCombo||0} 연속 처치 · 사뿐 회피 ${data.perfectDodges||0}회 · 우다다 ${data.overdriveCount||0}회</p><p class="upgrade-note">간식 창고 ${data.relays}/3 · 청소로봇 ${data.bossKills}기 격파 · 보유 간식 코인 ${meta.credits.toLocaleString()}</p>${data.won&&meta.wins===1?'<p class="unlock-message">주말 야간조이 열렸습니다. 우리 아지트에서 더 어려운 근무에 도전할 수 있습니다.</p>':''}<div class="modal-bottom"><button class="primary-button" data-action="retry"><span>한 번 더 출근하기</span><span>↗</span></button><button class="secondary-button" data-action="result-base">우리 아지트</button></div><button class="quiet-button" data-action="menu">메뉴로 돌아가기</button>`;
+  if(data.won){endingResultHTML=resultHTML;endingStep=0;showEnding(data);}else openModal(resultHTML);
+}
+
+let endingResultHTML='',endingStep=0,endingData=null;
+function showEnding(data=endingData){endingData=data;const cat=CLASSES.find(c=>c.id===data.classId),finals=EVOLUTIONS.filter(e=>e.requires&&game.evolved[e.id]).length,title=game.damageTaken===0?'완벽한 야간조':data.perfectDodges>=5?'사뿐 회피의 달인':finals>=2?'장난감 진화 장인':'편의점의 수호냥';
+ openModal(endingScene(data,endingStep,finals,title));
 }
 
 function updateHUD(force=false){
@@ -105,7 +113,7 @@ function updateHUD(force=false){
   else if(game.t<DURATION)objective='<b>퇴근 준비 완료</b><small>15:00까지 생존 · 중앙으로 이동</small>';
   else objective='<b>중앙에서 5초간 생존</b><small>파란색 퇴근 표시를 따라가세요</small>';
   if(force||objective!==lastObjective){$('objective').innerHTML=objective;lastObjective=objective;}
-  const boss=game.enemies.filter(e=>e.boss&&!e.dead).sort((a,b)=>(b.type==='final')-(a.type==='final'))[0];$('boss-hud').classList.toggle('hidden',!boss);if(boss){$('boss-name').textContent=boss.type==='final'?'대왕 청소기 · 대왕 청소기':boss.tier===1?'청소반장 · 청소로봇':'점보 청소기 · 점보 청소기';$('boss-health').textContent=Math.ceil(boss.hp/boss.maxHp*100)+'%';$('boss-fill').style.width=Math.max(0,boss.hp/boss.maxHp*100)+'%';}
+  const boss=game.enemies.filter(e=>e.boss&&!e.dead).sort((a,b)=>(b.type==='final')-(a.type==='final'))[0];$('boss-hud').classList.toggle('hidden',!boss);if(boss){$('boss-name').textContent=bossProfile(boss).name+' · '+['경계','출력 상승','최대 출력'][boss.bossStage||0];$('boss-health').textContent=Math.ceil(boss.hp/boss.maxHp*100)+'%';$('boss-fill').style.width=Math.max(0,boss.hp/boss.maxHp*100)+'%';}
   const charging=game.charging,evac=game.t>=900&&game.finalDead&&game.relays.every(r=>r.active)&&game.evacuating>0;
   $('relay-progress').classList.toggle('hidden',!charging&&!evac);if(charging||evac){$('relay-progress').querySelector('span').textContent=charging?'회수 '+Math.ceil(10-charging.charge)+'초':'퇴근 '+Math.ceil(5-game.evacuating)+'초';$('relay-fill').style.width=(charging?charging.charge/10:game.evacuating/5)*100+'%';}
   const dock=JSON.stringify([game.u,game.evolved,game.protocol]);if(force||dock!==lastDock){lastDock=dock;const weapons=UPGRADES.filter(u=>WEAPONS.includes(u.id)&&game.u[u.id]);$('weapon-dock').innerHTML=`<div class="weapon-chip" title="${game.classData.weapon||(game.classId==='warden'?'팝콘총':'츄르총')} · 마우스 조준 / 자동 연사"><span class="weapon-icon">⌁</span><small>기본</small></div>`+weapons.map(u=>{const evolved=[...EVOLUTIONS].reverse().find(e=>e.weapon===u.id&&game.evolved[e.id]);return `<div class="weapon-chip" style="--skill-color:${skillColor(u)}" title="${evolved?evolved.name:u.name}"><span class="weapon-icon" ${evolved?'style="color:var(--accent)"':''}>${evolved?evolved.icon:u.icon}</span><small>${evolved?'진화':'LV.'+game.u[u.id]}</small></div>`;}).join('')+Array.from({length:Math.max(0,game.weaponSlots-weapons.length)},()=>'<div class="weapon-chip empty"><span class="weapon-icon">＋</span><small>빈자리</small></div>').join('');}
@@ -136,6 +144,7 @@ $('modal').addEventListener('click',e=>{
   const upgrade=e.target.closest('[data-upgrade]');if(upgrade){game.choose(upgrade.dataset.upgrade);return;}
   const base=e.target.closest('[data-base]');if(base&&!base.disabled){const u=BASE_UPGRADES.find(u=>u.id===base.dataset.base);const n=meta.base[u.id]||0,cost=u.cost*(n+1);if(n<u.max&&meta.credits>=cost){meta.credits-=cost;meta.base[u.id]=n+1;saveMeta();sound.play('level');menuRefresh();showBase();}return;}
   const button=e.target.closest('[data-action]');if(!button||button.disabled)return;const a=button.dataset.action;
+  if(a==='ending-results'){openModal(endingResultHTML);return;}if(a==='ending-next'){if(endingStep<2){endingStep++;showEnding();}else openModal(endingResultHTML);return;}
   if(a==='draw-cat'){const r=drawCat(meta);if(r){saveMeta();menuRefresh();showCollection(r.duplicate?r.cat.name+' 중복 · 45코인 반환':r.cat.name+' 합류!');}return;}
   if(a==='buy-ticket'){if(buyTicket(meta)){saveMeta();menuRefresh();showCollection('부활권 1장을 받았어요.');}return;}
   if(a==='revive-ticket'){if(!adPending&&game.awaitingRevive&&meta.collection.tickets>0){meta.collection.tickets--;saveMeta();game.revive();}return;}

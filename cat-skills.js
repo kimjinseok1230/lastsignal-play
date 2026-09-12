@@ -1,5 +1,5 @@
-import {ACTIVE_SKILLS} from './roster.js?v=cat15';
-import {WORLD} from './data.js?v=cat15';
+import {ACTIVE_SKILLS} from './roster.js?v=cat16';
+import {WORLD} from './data.js?v=cat16';
 const TAU=Math.PI*2,dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y),clamp=n=>Math.max(-WORLD+25,Math.min(WORLD-25,n));
 export const catSkills={
  resetCatSkills(){this.skillObjects=[];this.skillBuff=null;this.evoTimers={};},
@@ -22,7 +22,7 @@ export const catSkills={
   if(id==='moon')for(let i=-2;i<=2;i++)this.skillShot(p.x,p.y,p.angle+i*.25,'return',(60+this.level*3)*power,480);
   this.toast(ACTIVE_SKILLS[id].name,false,1.2);return true;
  },
- updateCatSkills(dt){const p=this.player;if(this.skillBuff){const b=this.skillBuff;b.life-=dt;if(b.kind==='sprint'){b.tick-=dt;if(b.tick<=0){b.tick=.3;this.traps.push({x:p.x,y:p.y,age:0,life:1.1,arm:.6,damage:30*this.stats.power,r:65,echo:true});}}if(b.life<=0){this.skillBuff=null;this.recalculate();}}
+ updateCatSkills(dt){const p=this.player;if(this.skillBuff){const b=this.skillBuff;b.life-=dt;b.flash=Math.max(0,(b.flash||0)-dt);if(b.kind==='sprint'){b.tick-=dt;if(b.tick<=0){b.tick=.3;this.traps.push({x:p.x,y:p.y,age:0,life:1.1,arm:.6,damage:30*this.stats.power,r:65,echo:true});}}if(b.life<=0){this.skillBuff=null;this.recalculate();}}
   for(const z of this.skillObjects){z.life-=dt;z.tick-=dt;
    if(z.kind==='flame'||z.kind==='satellites'){z.x=p.x;z.y=p.y;z.angle=p.angle;z.phase=(z.phase||0)+dt*1.6;}
    if(z.kind==='charge'){const e=this.enemies.find(e=>e.id===z.targetId&&!e.dead);if(!e){z.life=0;continue;}z.x=e.x;z.y=e.y;if(z.life<=0){this.damage(e,110*this.stats.power,'arc');for(const n of this.enemies)if(n!==e&&!n.dead&&dist(n,e)<85)this.damage(n,45*this.stats.power,'arc');this.ring(e.x,e.y,85,z.color,.35);this.sound.play('arc');if(this.evolved.tesla)this.evolutionBurst?.(e.x,e.y,100,'#ffed8c',true);}continue;}
@@ -40,10 +40,10 @@ export const catSkills={
   if(id==='crossbeam'){this.evoTimers[id]=4;const n=this.nearest(p,550);if(n)for(const a of [0,Math.PI/2]){const dx=Math.cos(a)*230,dy=Math.sin(a)*230;this.fx.push({kind:'rail',x:n.x-dx,y:n.y-dy,tx:n.x+dx,ty:n.y+dy,life:.3,max:.3,color:'#fff1a3',evo:true,final:true});for(const e of this.enemies)if(!e.dead&&e.warmup<=0&&Math.abs((e.x-n.x)*Math.sin(a)-(e.y-n.y)*Math.cos(a))<e.r+10&&dist(e,n)<230)this.damage(e,65*s.power,'rail');}}
   if(id==='garden'){this.evoTimers[id]=5;for(let i=0;i<3;i++){const a=p.angle+(i-1)*.7;this.traps.push({x:clamp(p.x+Math.cos(a)*150),y:clamp(p.y+Math.sin(a)*150),age:0,life:6,arm:1,r:100,damage:95*s.power});}}
  }},
- drawCatSkills(c){c.save();for(const z of this.skillObjects){if(z.kind==='web')continue;c.strokeStyle=z.color;c.fillStyle=z.color+'18';c.lineWidth=2;c.beginPath();if(z.kind==='flame'){c.moveTo(z.x,z.y);c.arc(z.x,z.y,z.r,(z.angle||0)-.72,(z.angle||0)+.72);c.closePath();}else c.arc(z.x,z.y,z.r,0,TAU);c.fill();c.stroke();
+ drawCatSkills(c){c.save();for(const z of this.skillObjects){if(['web','flame','clinic'].includes(z.kind))continue;c.strokeStyle=z.color;c.fillStyle=z.color+'18';c.lineWidth=2;c.beginPath();if(z.kind==='flame'){c.moveTo(z.x,z.y);c.arc(z.x,z.y,z.r,(z.angle||0)-.72,(z.angle||0)+.72);c.closePath();}else c.arc(z.x,z.y,z.r,0,TAU);c.fill();c.stroke();
   if(z.kind==='web')for(let i=0;i<8;i++){c.beginPath();c.moveTo(z.x,z.y);c.lineTo(z.x+Math.cos(i*TAU/8)*z.r,z.y+Math.sin(i*TAU/8)*z.r);c.stroke();}
   if(z.kind==='turret')this.drawDrone(c,z.x,z.y,this.visualTime);
   if(z.kind==='satellites')for(let i=0;i<3;i++){const a=z.phase+i*TAU/3;this.drawDrone(c,z.x+Math.cos(a)*z.r,z.y+Math.sin(a)*z.r,a);}
   if(z.kind==='clinic'){c.beginPath();c.moveTo(z.x-12,z.y);c.lineTo(z.x+12,z.y);c.moveTo(z.x,z.y-12);c.lineTo(z.x,z.y+12);c.stroke();}
- }if(this.skillBuff){c.strokeStyle=this.skillBuff.kind==='guard'?'#ffe4a4':'#9fffe0';c.lineWidth=3;c.beginPath();c.arc(this.player.x,this.player.y,38,0,TAU);c.stroke();}c.restore();}
+ }if(this.skillBuff&&this.skillBuff.kind!=='guard'){c.strokeStyle=this.skillBuff.kind==='guard'?'#ffe4a4':'#9fffe0';c.lineWidth=3;c.beginPath();c.arc(this.player.x,this.player.y,38,0,TAU);c.stroke();}c.restore();}
 };

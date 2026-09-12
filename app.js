@@ -1,8 +1,8 @@
-import {missionUnlocks,buyCat,buyTicket,drawCat,DRAW_COST,TICKET_COST,PASSIVES,ACTIVE_SKILLS} from './roster.js?v=cat14';
-import {bindStick} from './aim.js?v=cat14';
-import {SignalGame as Game} from './cat-game.js?v=cat14';
-import {Sound} from './audio.js?v=cat14';
-import {CLASSES,UPGRADES,EVOLUTIONS,BASE_UPGRADES,DURATION,WEAPONS,PROTOCOLS,createMeta,normalizeMeta,formatTime,xpRequired} from './data.js?v=cat14';
+import {missionUnlocks,buyCat,buyTicket,drawCat,DRAW_COST,TICKET_COST,PASSIVES,ACTIVE_SKILLS} from './roster.js?v=cat15';
+import {bindStick} from './aim.js?v=cat15';
+import {SignalGame as Game} from './cat-game.js?v=cat15';
+import {Sound} from './audio.js?v=cat15';
+import {CLASSES,UPGRADES,EVOLUTIONS,BASE_UPGRADES,DURATION,WEAPONS,PROTOCOLS,createMeta,normalizeMeta,formatTime,xpRequired} from './data.js?v=cat15';
 
 const $=id=>document.getElementById(id);
 const STORAGE='night-shift-cats-v1',RUN_STORAGE=STORAGE+'-run';

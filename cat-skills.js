@@ -1,5 +1,5 @@
-import {ACTIVE_SKILLS} from './roster.js?v=cat14';
-import {WORLD} from './data.js?v=cat14';
+import {ACTIVE_SKILLS} from './roster.js?v=cat15';
+import {WORLD} from './data.js?v=cat15';
 const TAU=Math.PI*2,dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y),clamp=n=>Math.max(-WORLD+25,Math.min(WORLD-25,n));
 export const catSkills={
  resetCatSkills(){this.skillObjects=[];this.skillBuff=null;this.evoTimers={};},

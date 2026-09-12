@@ -1,7 +1,7 @@
-import {TestGame} from './test-game.js?v=2';
-import {CLASSES,WEAPONS,UPGRADES,EVOLUTIONS,formatTime} from './data.js?v=cat14';
-import {ACTIVE_SKILLS} from './roster.js?v=cat14';
-import {Sound} from './audio.js?v=cat14';
+import {TestGame} from './test-game.js?v=3';
+import {CLASSES,WEAPONS,UPGRADES,EVOLUTIONS,formatTime} from './data.js?v=cat15';
+import {ACTIVE_SKILLS} from './roster.js?v=cat15';
+import {Sound} from './audio.js?v=cat15';
 const $=id=>document.getElementById(id),settings={sound:true,volume:.36,musicVolume:.4,effectsVolume:.8,particles:true,shake:true},sound=new Sound(settings);
 let toastUntil=0;const g=new TestGame($('world'),{toast:message=>{$('notice').textContent=message;toastUntil=performance.now()+2400;}},sound,settings);
 $('cat').innerHTML=CLASSES.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');$('weapon').innerHTML='<option value="none">전용 스킬만 테스트</option>'+WEAPONS.map(id=>`<option value="${id}">${UPGRADES.find(u=>u.id===id).name}</option>`).join('');$('weapon').value='orbit';

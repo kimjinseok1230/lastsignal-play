@@ -1,4 +1,4 @@
-import {EXTRA_CATS,collectionMeta} from './roster.js?v=cat16';
+import {EXTRA_CATS,collectionMeta} from './roster.js?v=cat17';
 export const VERSION = 1;
 export const EDITION = 2;
 export const DURATION = 900;

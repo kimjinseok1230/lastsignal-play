@@ -1,5 +1,5 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';
-import {CatGame} from '../cat-game.js?v=cat16';import {createMeta,EVOLUTIONS} from '../data.js?v=cat16';
+import {CatGame} from '../cat-game.js?v=cat17';import {createMeta,EVOLUTIONS} from '../data.js?v=cat17';
 function make(){const g=new CatGame({getContext:()=>null},{},{play(){},ambient(){}},{particles:false});g.start('runner',createMeta());g.enemies=[];g.player.angle=0;g.protocol='bastion';g.level=10;const e=g.spawnEnemy('brute',100,0);e.warmup=0;e.hp=e.maxHp=10000;return g;}
 test('six final evolutions need their first evolution and a second support',()=>{for(const evo of EVOLUTIONS.filter(e=>e.requires)){const g=make();g.u[evo.weapon]=5;g.u[evo.support]=2;assert(!g.getChoices().some(e=>e.id===evo.id));g.evolved[evo.requires]=true;assert(g.getChoices().some(e=>e.id===evo.id));g.applyUpgrade(evo.id);assert(g.evolved[evo.id]);assert(!g.getChoices().some(e=>e.id===evo.id));const h=make();assert(h.restore(JSON.parse(JSON.stringify(g.serialize()))));assert(h.evolved[evo.id]);}});
 test('final evolution effects block, detonate, split, freeze, crossfire and plant',()=>{

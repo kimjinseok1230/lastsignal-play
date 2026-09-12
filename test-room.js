@@ -1,8 +1,8 @@
-import {endingScene} from './ending-scene.js?v=1';
-import {TestGame} from './test-game.js?v=4';
-import {CLASSES,WEAPONS,UPGRADES,EVOLUTIONS,formatTime} from './data.js?v=cat16';
-import {ACTIVE_SKILLS} from './roster.js?v=cat16';
-import {Sound} from './audio.js?v=cat16';
+import {endingScene} from './ending-scene.js?v=2';
+import {TestGame} from './test-game.js?v=5';
+import {CLASSES,WEAPONS,UPGRADES,EVOLUTIONS,formatTime} from './data.js?v=cat17';
+import {ACTIVE_SKILLS} from './roster.js?v=cat17';
+import {Sound} from './audio.js?v=cat17';
 const $=id=>document.getElementById(id),settings={sound:true,volume:.36,musicVolume:.4,effectsVolume:.8,particles:true,shake:true},sound=new Sound(settings);
 let toastUntil=0;const g=new TestGame($('world'),{toast:message=>{$('notice').textContent=message;toastUntil=performance.now()+2400;}},sound,settings);
 $('cat').innerHTML=CLASSES.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');$('weapon').innerHTML='<option value="none">전용 스킬만 테스트</option>'+WEAPONS.map(id=>`<option value="${id}">${UPGRADES.find(u=>u.id===id).name}</option>`).join('');$('weapon').value='orbit';
@@ -25,3 +25,5 @@ start();let last=performance.now();function frame(now){const dt=Math.min(.05,(no
 let previewStep=0;const previewData={classId:'runner',relays:3,bossKills:3,kills:500,bestCombo:50,credits:300};
 function drawEndingPreview(){previewData.classId=g.classId;$('ending-content').innerHTML='<p>테스트 미리보기 · 아래 성과는 예시이며 보상이 지급되지 않습니다.</p>'+endingScene(previewData,previewStep,2,'장난감 진화 장인');}
 $('ending-preview').onclick=()=>{if(g.state==='playing')g.pause();previewStep=0;drawEndingPreview();$('ending-dialog').showModal();};$('ending-close').onclick=()=>$('ending-dialog').close();$('ending-content').onclick=e=>{const a=e.target.closest('[data-action]')?.dataset.action;if(a==='ending-next'&&previewStep<2){previewStep++;drawEndingPreview();}else if(a)$('ending-dialog').close();};
+
+$('synergy').onchange=()=>{const presets={web:['spider',{arc:5}],fire:['chef',{rocket:5}],drone:['engineer',{orbit:5,rail:5}],ice:['frost',{field:5,crit:4}]},v=presets[$('synergy').value];if(!v)return;$('cat').value=v[0];start();g.equip('none',0);g.u=v[1];g.recalculate();g.primaryEnabled=true;$('primary').checked=true;$('weapon').value='none';$('stage').value='0';$('weapon-info').textContent='시너지 프리셋 적용 · E 스킬과 기본 공격을 함께 사용하세요.';g.spawnGroup('brute',20);};

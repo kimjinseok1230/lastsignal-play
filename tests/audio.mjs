@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {Sound} from '../audio.js';
-import {normalizeMeta,createMeta} from '../data.js?v=cat16';
+import {normalizeMeta,createMeta} from '../data.js?v=cat17';
 test('score schedules musical layers and does not catch up a backgrounded clock',()=>{const s=new Sound({sound:true});s.ctx={state:'running',currentTime:1};s.mode='playing';const notes=[];s.tone=(...a)=>notes.push(a);s.noise=()=>{};s.ambient(1/60,0);assert(notes.length>0);assert(notes.every(n=>n[6]==='music'));assert(s.step<=3);s.ctx.currentTime=1000;s.ambient(1/60,0);assert(s.step<=6);const before=s.step;s.mode='paused';s.ambient(1/60,0);assert.equal(s.step,before);s.mode='playing';s.settings.sound=false;s.ambient(1/60,0);assert.equal(s.step,before);});
 test('all cat shots have effects and impact bursts are rate limited',()=>{const s=new Sound({sound:true});s.ctx={state:'running',currentTime:1};const notes=[];s.tone=(...a)=>notes.push(a);s.noise=()=>notes.push('noise');for(const id of ['web','ice','pierce','flame','heal','chain','stars','gravity','return']){s.ctx.currentTime++;const before=notes.length;s.play('weapon-'+id);assert(notes.length>before,id);}s.play('impact');const n=notes.length;for(let i=0;i<50;i++)s.play('impact');assert.equal(notes.length,n);});
 test('independent music/effect levels preserve zero and migrate old settings',()=>{const old=normalizeMeta({...createMeta(),settings:{sound:false,volume:.2}});assert.equal(old.settings.sound,false);assert.equal(old.settings.musicVolume,.55);const zero=normalizeMeta({...createMeta(),settings:{sound:true,volume:.2,musicVolume:0,effectsVolume:0}});assert.equal(zero.settings.musicVolume,0);assert.equal(zero.settings.effectsVolume,0);});

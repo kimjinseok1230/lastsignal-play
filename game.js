@@ -1,4 +1,4 @@
-import {CLASSES,UPGRADES,EVOLUTIONS,ENEMY_TYPES,RELAY_POSITIONS,DURATION,WORLD,VERSION,xpRequired} from './data.js?v=cat16';
+import {CLASSES,UPGRADES,EVOLUTIONS,ENEMY_TYPES,RELAY_POSITIONS,DURATION,WORLD,VERSION,xpRequired} from './data.js?v=cat17';
 
 const TAU=Math.PI*2;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -121,7 +121,7 @@ export class Game {
     if(b.type==='rocket'&&b.life<=0&&!b.exploded)this.explode(b);
   }
   explode(b){if(b.exploded)return;b.exploded=true;b.life=0;this.ring(b.x,b.y,b.blast,'#ebb991',.45);this.particles(b.x,b.y,11,'#ffaf76',130);for(const e of this.nearEnemies(b.x,b.y,b.blast))if(!e.dead&&e.warmup<=0&&Math.hypot(e.x-b.x,e.y-b.y)<b.blast+e.r)this.damage(e,b.damage,'rocket');this.sound.play('explode');}
-  damage(e,amount,source){if(e.dead)return;const crit=(source==='bullet'||source==='arc')&&this.random()<this.stats.crit;amount*=crit?this.stats.critDamage:1;e.hp-=amount;e.flash=.09;if(crit||source==='rocket'||e.boss&&this.random()<.16)this.float(e.x,e.y-e.r,String(Math.round(amount)),crit?'#ffe4a4':'#c1dbce',crit?16:12);if(e.hp<=0)this.kill(e);}
+  damage(e,amount,source){if(e.dead)return;const crit=(source==='bullet'||source==='arc')&&this.random()<this.stats.crit;amount*=crit?this.stats.critDamage:1;e.hp-=amount;e.flash=.09;if(crit||source==='rocket'||e.boss&&this.random()<.16)this.float(e.x,e.y-e.r,String(Math.round(amount)),crit?'#ffe4a4':'#c1dbce',crit?16:12);if(e.hp<=0)this.kill(e);if(crit)this.onCriticalHit?.(e,amount,source);}
   kill(e){
     if(e.dead)return;e.dead=true;this.kills++;this.particles(e.x,e.y,e.boss?38:e.type==='elite'?20:6,e.color,e.boss?230:95);this.spawnLoot('xp',e.x,e.y,e.xp);
     if(e.boss){this.bossKills++;this.spawnLoot('chest',e.x,e.y,1);this.spawnLoot('med',e.x+42,e.y,1);this.collected+=40;this.shake=10;this.sound.play('relay');this.ring(e.x,e.y,250,COLORS.mint,1.2);this.player.hp=Math.min(this.player.maxHp,this.player.hp+25);if(e.type==='final'){this.finalDead=true;this.toast('대왕 청소기 격파. 15:00에 중앙 퇴근 지점이 열립니다.',false,7);}else this.toast('청소로봇 격파 · 생명력 +25 · 간식 봉지 투하',false,5);}

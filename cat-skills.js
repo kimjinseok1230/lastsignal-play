@@ -1,5 +1,5 @@
-import {ACTIVE_SKILLS} from './roster.js?v=cat18';
-import {WORLD} from './data.js?v=cat18';
+import {ACTIVE_SKILLS} from './roster.js?v=cat19';
+import {WORLD} from './data.js?v=cat19';
 const TAU=Math.PI*2,dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y),clamp=n=>Math.max(-WORLD+25,Math.min(WORLD-25,n));
 export const catSkills={
  resetCatSkills(){this.skillObjects=[];this.skillBuff=null;this.evoTimers={};},
@@ -13,7 +13,7 @@ export const catSkills={
   if(id==='warden'){this.skillBuff={kind:'guard',life:5,shield:Math.round(p.maxHp*.45)};}
   if(id==='spider')add('web',6,{x,y,r:r*.7});
   if(id==='frost'){for(let i=-2;i<=2;i++)this.skillShot(p.x,p.y,p.angle+i*.12,'freeze',(65+this.level*3)*power,620);}
-  if(id==='ninja'){const ox=p.x,oy=p.y;p.x=clamp(x+Math.cos(p.angle)*60);p.y=clamp(y+Math.sin(p.angle)*60);p.invuln=Math.max(p.invuln,.65);const dx=p.x-ox,dy=p.y-oy,len=dx*dx+dy*dy;for(const e of this.enemies){const t=len?Math.max(0,Math.min(1,((e.x-ox)*dx+(e.y-oy)*dy)/len)):0;if(!e.dead&&e.warmup<=0&&Math.hypot(e.x-ox-t*dx,e.y-oy-t*dy)<e.r+42)this.damage(e,(170+this.level*5)*power,'pulse');}this.fx.push({kind:'rail',x:ox,y:oy,tx:p.x,ty:p.y,life:.35,max:.35,color:'#ffb7db'});}
+  if(id==='ninja'){const ox=p.x,oy=p.y;p.x=clamp(x+Math.cos(p.angle)*60);p.y=clamp(y+Math.sin(p.angle)*60);p.invuln=Math.max(p.invuln,.65);const dx=p.x-ox,dy=p.y-oy,len=dx*dx+dy*dy;for(const e of this.enemies){const t=len?Math.max(0,Math.min(1,((e.x-ox)*dx+(e.y-oy)*dy)/len)):0;if(!e.dead&&e.warmup<=0&&Math.hypot(e.x-ox-t*dx,e.y-oy-t*dy)<e.r+42)this.damage(e,(170+this.level*5)*power,'pulse');}this.fx.push({kind:'slash',x:(ox+p.x)/2,y:(oy+p.y)/2,a:p.angle,r:Math.hypot(p.x-ox,p.y-oy)/2,life:.35,max:.35,color:'#ffb7db'});}
   if(id==='chef')add('flame',3,{r:r*1.1});
   if(id==='nurse')add('clinic',7,{r:105});
   if(id==='spark'){const targets=this.enemies.filter(e=>!e.dead&&e.warmup<=0&&dist(e,p)<r*1.5).sort((a,b)=>dist(a,p)-dist(b,p)).slice(0,6);for(const e of targets)add('charge',1.2,{targetId:e.id,x:e.x,y:e.y,r:24});}
@@ -25,7 +25,7 @@ export const catSkills={
  updateCatSkills(dt){const p=this.player;if(this.skillBuff){const b=this.skillBuff;b.life-=dt;b.flash=Math.max(0,(b.flash||0)-dt);if(b.kind==='sprint'){b.tick-=dt;if(b.tick<=0){b.tick=.3;this.traps.push({x:p.x,y:p.y,age:0,life:1.1,arm:.6,damage:30*this.stats.power,r:65,echo:true});}}if(b.life<=0){this.skillBuff=null;this.recalculate();}}
   for(const z of this.skillObjects){z.life-=dt;z.tick-=dt;
    if(z.kind==='flame'||z.kind==='satellites'){z.x=p.x;z.y=p.y;z.angle=p.angle;z.phase=(z.phase||0)+dt*1.6;}
-   if(z.kind==='charge'){const e=this.enemies.find(e=>e.id===z.targetId&&!e.dead);if(!e){z.life=0;continue;}z.x=e.x;z.y=e.y;if(z.life<=0){this.damage(e,110*this.stats.power,'arc');for(const n of this.enemies)if(n!==e&&!n.dead&&dist(n,e)<85)this.damage(n,45*this.stats.power,'arc');this.ring(e.x,e.y,85,z.color,.35);this.sound.play('arc');if(this.evolved.tesla)this.evolutionBurst?.(e.x,e.y,100,'#ffed8c',true);}continue;}
+   if(z.kind==='charge'){const e=this.enemies.find(e=>e.id===z.targetId&&!e.dead);if(!e){z.life=0;continue;}z.x=e.x;z.y=e.y;if(z.life<=0){this.damage(e,110*this.stats.power,'arc');for(const n of this.enemies)if(n!==e&&!n.dead&&dist(n,e)<85)this.damage(n,45*this.stats.power,'arc');this.fx.push({kind:'ring',skillBurst:'electric',x:e.x,y:e.y,r:85,life:.35,max:.35,color:z.color});this.sound.play('arc');if(this.evolved.tesla)this.evolutionBurst?.(e.x,e.y,100,'#ffed8c',true);}continue;}
    if(z.life<=0||z.tick>0)continue;z.tick=z.kind==='flame'?.2:z.kind==='turret'?.45:.5;
    if(z.kind==='turret'||z.kind==='satellites'){const n=this.nearest(z,460);if(n){const count=z.kind==='turret'?1:3;for(let i=0;i<count;i++){const a=z.phase+i*TAU/3,sx=z.kind==='turret'?z.x:z.x+Math.cos(a)*z.r,sy=z.kind==='turret'?z.y:z.y+Math.sin(a)*z.r;this.skillShot(sx,sy,Math.atan2(n.y-sy,n.x-sx),z.kind==='turret'?'pierce':'stars',this.stats.damage*.8);}this.sound.play(z.kind==='turret'?'weapon-engineer':'weapon-stars');}}
    if(z.kind==='flame')this.sound.play('weapon-flame');

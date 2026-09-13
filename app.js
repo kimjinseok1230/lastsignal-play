@@ -1,12 +1,12 @@
-import {COSMETICS,hasCosmetic,equipCosmetic,cosmeticCard} from './cosmetics.js?v=cat18';
-import {SYNERGIES,synergyHints,nextGoals} from './build-systems.js?v=cat18';
+import {COSMETICS,hasCosmetic,equipCosmetic,cosmeticCard} from './cosmetics.js?v=cat19';
+import {SYNERGIES,synergyHints,nextGoals} from './build-systems.js?v=cat19';
 import {endingScene} from './ending-scene.js?v=2';
-import {bossProfile} from './cat-bosses.js?v=cat18';
-import {missionUnlocks,buyCat,buyTicket,drawCat,DRAW_COST,TICKET_COST,PASSIVES,ACTIVE_SKILLS} from './roster.js?v=cat18';
-import {bindStick} from './aim.js?v=cat18';
-import {SignalGame as Game} from './cat-game.js?v=cat18';
-import {Sound} from './audio.js?v=cat18';
-import {CLASSES,UPGRADES,EVOLUTIONS,BASE_UPGRADES,DURATION,WEAPONS,PROTOCOLS,createMeta,normalizeMeta,formatTime,xpRequired} from './data.js?v=cat18';
+import {bossProfile} from './cat-bosses.js?v=cat19';
+import {missionUnlocks,buyCat,buyTicket,drawCat,DRAW_COST,TICKET_COST,PASSIVES,ACTIVE_SKILLS} from './roster.js?v=cat19';
+import {bindStick} from './aim.js?v=cat19';
+import {SignalGame as Game} from './cat-game.js?v=cat19';
+import {Sound} from './audio.js?v=cat19';
+import {CLASSES,UPGRADES,EVOLUTIONS,BASE_UPGRADES,DURATION,WEAPONS,PROTOCOLS,createMeta,normalizeMeta,formatTime,xpRequired} from './data.js?v=cat19';
 
 const $=id=>document.getElementById(id);
 const STORAGE='night-shift-cats-v1',RUN_STORAGE=STORAGE+'-run';
@@ -41,7 +41,7 @@ function showCollection(message=''){
 let wardrobeTab='all';
 function showWardrobe(){
  const count=COSMETICS.filter(c=>hasCosmetic(meta,c)).length;
- openModal(`${closeButton}<div class="eyebrow">야간조 드레스룸 · ${count} / ${COSMETICS.length}</div><h2 id="modal-title">오늘은 어떤 모습으로 출근할까요?</h2><p class="modal-intro">능력치는 그대로, 내 고양이만의 분위기. 모든 의상과 효과는 전투 미리보기에서 체험할 수 있어요.</p><div class="wardrobe-pass"><strong>무료 출근 보상</strong><span>1회 근무 · 민트 스카프 ${meta.runs>=1?'✓':''}</span><span>3회 근무 · 캣닢 꽃잎 ${meta.runs>=3?'✓':''}</span><span>첫 퇴근 성공 · 사원증 ${meta.wins>=1?'✓':''}</span></div><div class="starter-preview"><div><small>판매 준비 중 · 가격 초안 3,900원</small><h3>첫 출근팩</h3><p>야간조 유니폼 + 말랑 발바닥 처치 효과 + 복숭아 사원증</p><a class="secondary-button" target="_blank" rel="noopener" href="./test-room.html?v=cat18&look=starter&cat=${selectedClass}">첫 출근팩 전투 미리보기 ↗</a></div><span aria-hidden="true">🐾</span></div><div class="wardrobe-tabs" aria-label="꾸미기 분류">${[['all','전체'],['outfit','의상'],['effect','처치 효과'],['frame','사원증']].map(([id,name])=>`<button class="secondary-button" data-look-tab="${id}" aria-pressed="${wardrobeTab===id}">${name}</button>`).join('')}</div><div class="cosmetic-grid">${COSMETICS.filter(c=>wardrobeTab==='all'||c.slot===wardrobeTab).map(c=>cosmeticCard(c,meta,selectedClass)).join('')}</div><p class="upgrade-note">무료 보상은 완료한 근무 기록으로 해금됩니다. 판매 준비 중 상품은 미리보기 전용이며 현재 결제할 수 없습니다. 착용 기록은 이 브라우저에 저장됩니다.</p>`,hideModal);
+ openModal(`${closeButton}<div class="eyebrow">야간조 드레스룸 · ${count} / ${COSMETICS.length}</div><h2 id="modal-title">오늘은 어떤 모습으로 출근할까요?</h2><p class="modal-intro">능력치는 그대로, 내 고양이만의 분위기. 모든 의상과 효과는 전투 미리보기에서 체험할 수 있어요.</p><div class="wardrobe-pass"><strong>무료 출근 보상</strong><span>1회 근무 · 민트 스카프 ${meta.runs>=1?'✓':''}</span><span>3회 근무 · 캣닢 꽃잎 ${meta.runs>=3?'✓':''}</span><span>첫 퇴근 성공 · 사원증 ${meta.wins>=1?'✓':''}</span></div><div class="starter-preview"><div><small>판매 준비 중 · 가격 초안 3,900원</small><h3>첫 출근팩</h3><p>야간조 유니폼 + 말랑 발바닥 처치 효과 + 복숭아 사원증</p><a class="secondary-button" target="_blank" rel="noopener" href="./test-room.html?v=cat19&look=starter&cat=${selectedClass}">첫 출근팩 전투 미리보기 ↗</a></div><span aria-hidden="true">🐾</span></div><div class="wardrobe-tabs" aria-label="꾸미기 분류">${[['all','전체'],['outfit','의상'],['effect','처치 효과'],['frame','사원증']].map(([id,name])=>`<button class="secondary-button" data-look-tab="${id}" aria-pressed="${wardrobeTab===id}">${name}</button>`).join('')}</div><div class="cosmetic-grid">${COSMETICS.filter(c=>wardrobeTab==='all'||c.slot===wardrobeTab).map(c=>cosmeticCard(c,meta,selectedClass)).join('')}</div><p class="upgrade-note">무료 보상은 완료한 근무 기록으로 해금됩니다. 판매 준비 중 상품은 미리보기 전용이며 현재 결제할 수 없습니다. 착용 기록은 이 브라우저에 저장됩니다.</p>`,hideModal);
 }
 let adPending=false;
 function showRevive(){sound.setMode('paused');resetControls();saveRun();const adReady=typeof window.CatRewardedAds?.show==='function';openModal(`<div class="eyebrow">한 번 더 도전</div><h2 id="modal-title">다시 일어날까요?</h2><p class="modal-intro">체력 60% 회복 · 3초 무적 · 주변 적 밀어내기<br>한 판에 부활 1회</p><div class="modal-bottom"><button class="primary-button" data-action="revive-ticket" ${meta.collection.tickets<1?'disabled':''}>부활권 사용 (${meta.collection.tickets}장)</button>${adReady?'<button class="secondary-button" data-action="revive-ad">광고 보고 부활</button>':''}</div><p id="revive-message" class="upgrade-note" role="status">${adReady?'광고 시청 완료 후에만 부활합니다.':'부활권은 고양이 도감에서 코인으로 구매할 수 있어요.'}</p><button class="quiet-button" data-action="accept-death">이번 근무 마치기</button>`);}

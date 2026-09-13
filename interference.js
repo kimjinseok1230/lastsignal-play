@@ -1,7 +1,7 @@
-import {aiming} from './aim.js?v=cat18';
-import {Game} from './game.js?v=cat18';
-import {WORLD,DURATION,EDITION,ENEMY_TYPES,UPGRADES,EVOLUTIONS,WEAPONS,PROTOCOLS} from './data.js?v=cat18';
-import {signalVisuals} from './signal-visuals.js?v=cat18';
+import {aiming} from './aim.js?v=cat19';
+import {Game} from './game.js?v=cat19';
+import {WORLD,DURATION,EDITION,ENEMY_TYPES,UPGRADES,EVOLUTIONS,WEAPONS,PROTOCOLS} from './data.js?v=cat19';
+import {signalVisuals} from './signal-visuals.js?v=cat19';
 
 const TAU=Math.PI*2;
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));

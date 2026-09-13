@@ -1,5 +1,5 @@
-import {CatGame} from './cat-game.js?v=cat19';
-import {CLASSES,WEAPONS,EVOLUTIONS,createMeta} from './data.js?v=cat19';
+import {CatGame} from './cat-game.js?v=cat20';
+import {CLASSES,WEAPONS,EVOLUTIONS,createMeta} from './data.js?v=cat20';
 export class TestGame extends CatGame{
  constructor(canvas,callbacks,sound,settings){super(canvas,{toast:callbacks.toast},sound,settings);this.manualSpawns=true;this.invincible=true;this.noCooldown=true;this.autoAim=true;this.primaryEnabled=true;}
  startTest(id='runner'){if(!CLASSES.some(c=>c.id===id))return false;super.start(id,createMeta());this.events=[];this.nextInterference=1e9;this.clearRoom();return true;}

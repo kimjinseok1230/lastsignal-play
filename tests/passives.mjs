@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {CatGame} from '../cat-game.js?v=cat19';
-import {createMeta} from '../data.js?v=cat19';
+import {CatGame} from '../cat-game.js?v=cat20';
+import {createMeta} from '../data.js?v=cat20';
 const make=id=>{const g=new CatGame({getContext:()=>null},{},{play(){},ambient(){}},{particles:false,shake:false});g.start(id,createMeta());g.enemies=[];g.random=()=>.99;return g;};
 const enemy=g=>{const e=g.spawnEnemy('brute',250,0);e.warmup=0;e.hp=e.maxHp=10000;return e;};
 test('starter passives grant an echo, initial feathers and third-hit guard',()=>{const r=make('runner');r.dash();assert(r.traps.some(t=>t.echo));assert.equal(make('engineer').u.orbit,1);const w=make('warden');const hp=w.player.hp;for(let i=0;i<3;i++){w.player.invuln=0;w.hitPlayer(20);}assert.equal(hp-w.player.hp,44);});

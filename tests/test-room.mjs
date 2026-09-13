@@ -1,5 +1,5 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';
-import {TestGame} from '../test-game.js?v=7';import {CLASSES,WEAPONS,EVOLUTIONS} from '../data.js?v=cat19';
+import {TestGame} from '../test-game.js?v=8';import {CLASSES,WEAPONS,EVOLUTIONS} from '../data.js?v=cat20';
 const make=()=>new TestGame({getContext:()=>null},{save(){throw Error('save forbidden');},finish(){throw Error('reward forbidden');}},{play(){},ambient(){}},{particles:true});
 test('all cats and all evolution stages are accessible without progression',()=>{const g=make();for(const c of CLASSES){assert(g.startTest(c.id));assert.equal(g.classId,c.id);}for(const w of WEAPONS)for(const stage of [0,1,2]){assert(g.equip(w,stage));assert.equal(g.u[w],5);assert.equal(Object.keys(g.evolved).length,stage);if(stage===2)assert(g.evolved[EVOLUTIONS.find(e=>e.weapon===w&&e.requires).id]);}assert(g.equip('none',0));assert.equal(Object.keys(g.u).length,0);});
 test('test games cannot save or settle rewards and support invincibility',()=>{const g=make();g.startTest('runner');g.player.invuln=0;const hp=g.player.hp;g.hitPlayer(1000);assert.equal(g.player.hp,hp);g.invincible=false;g.hitPlayer(1000);assert.equal(g.state,'paused');assert.equal(g.serialize(),null);assert.equal(g.restore({}),false);g.recover();assert.equal(g.state,'playing');assert.equal(g.player.hp,g.player.maxHp);});

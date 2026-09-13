@@ -1,12 +1,12 @@
-import {COSMETICS,hasCosmetic,equipCosmetic,cosmeticCard} from './cosmetics.js?v=cat20';
-import {SYNERGIES,synergyHints,nextGoals} from './build-systems.js?v=cat20';
+import {COSMETICS,hasCosmetic,equipCosmetic,cosmeticCard} from './cosmetics.js?v=cat21';
+import {SYNERGIES,synergyHints,nextGoals} from './build-systems.js?v=cat21';
 import {endingScene} from './ending-scene.js?v=2';
-import {bossProfile} from './cat-bosses.js?v=cat20';
-import {missionUnlocks,buyCat,buyTicket,drawCat,DRAW_COST,TICKET_COST,PASSIVES,ACTIVE_SKILLS} from './roster.js?v=cat20';
-import {bindStick} from './aim.js?v=cat20';
-import {SignalGame as Game} from './cat-game.js?v=cat20';
-import {Sound} from './audio.js?v=cat20';
-import {CLASSES,UPGRADES,EVOLUTIONS,BASE_UPGRADES,DURATION,WEAPONS,PROTOCOLS,createMeta,normalizeMeta,formatTime,xpRequired} from './data.js?v=cat20';
+import {bossProfile} from './cat-bosses.js?v=cat21';
+import {missionUnlocks,buyCat,buyTicket,drawCat,DRAW_COST,TICKET_COST,PASSIVES,ACTIVE_SKILLS} from './roster.js?v=cat21';
+import {bindStick} from './aim.js?v=cat21';
+import {SignalGame as Game} from './cat-game.js?v=cat21';
+import {Sound} from './audio.js?v=cat21';
+import {CLASSES,UPGRADES,EVOLUTIONS,BASE_UPGRADES,DURATION,WEAPONS,PROTOCOLS,createMeta,normalizeMeta,formatTime,xpRequired} from './data.js?v=cat21';
 
 const $=id=>document.getElementById(id);
 const STORAGE='night-shift-cats-v1',RUN_STORAGE=STORAGE+'-run';
@@ -30,8 +30,8 @@ const game=new Game($('world'),{
 
 function saveMeta(){write(STORAGE,meta);}
 function saveRun(){const data=game.serialize();if(data){savedRun=data;write(RUN_STORAGE,data);}}
-function hideModal(){const wasVisible=!$('overlay').classList.contains('hidden');$('overlay').classList.add('hidden');modalClose=null;menuModal='';if(wasVisible&&priorFocus?.isConnected&&game.state==='menu')priorFocus.focus();}
-function openModal(html,onClose=null){priorFocus=document.activeElement;$('modal').innerHTML=html;$('overlay').classList.remove('hidden');modalClose=onClose;requestAnimationFrame(()=>$('modal').focus());}
+function hideModal(){const wasVisible=!$('overlay').classList.contains('hidden');$('overlay').classList.add('hidden');document.body.classList.remove('sheet-open');modalClose=null;menuModal='';if(wasVisible&&priorFocus?.isConnected&&game.state==='menu')priorFocus.focus();}
+function openModal(html,onClose=null){priorFocus=document.activeElement;$('modal').classList.remove('pause-sheet');$('modal').innerHTML=html;$('modal').scrollTop=0;$('overlay').classList.remove('hidden');document.body.classList.add('sheet-open');modalClose=onClose;requestAnimationFrame(()=>$('modal').focus());}
 const closeButton='<button class="modal-close" data-action="close" aria-label="닫기">×</button>';
 function owned(id){return meta.collection.owned.includes(id);}
 function showCollection(message=''){
@@ -41,7 +41,7 @@ function showCollection(message=''){
 let wardrobeTab='all';
 function showWardrobe(){
  const count=COSMETICS.filter(c=>hasCosmetic(meta,c)).length;
- openModal(`${closeButton}<div class="eyebrow">야간조 드레스룸 · ${count} / ${COSMETICS.length}</div><h2 id="modal-title">오늘은 어떤 모습으로 출근할까요?</h2><p class="modal-intro">능력치는 그대로, 내 고양이만의 분위기. 모든 의상과 효과는 전투 미리보기에서 체험할 수 있어요.</p><div class="wardrobe-pass"><strong>무료 출근 보상</strong><span>1회 근무 · 민트 스카프 ${meta.runs>=1?'✓':''}</span><span>3회 근무 · 캣닢 꽃잎 ${meta.runs>=3?'✓':''}</span><span>첫 퇴근 성공 · 사원증 ${meta.wins>=1?'✓':''}</span></div><div class="starter-preview"><div><small>판매 준비 중 · 가격 초안 3,900원</small><h3>첫 출근팩</h3><p>야간조 유니폼 + 말랑 발바닥 처치 효과 + 복숭아 사원증</p><a class="secondary-button" target="_blank" rel="noopener" href="./test-room.html?v=cat20&look=starter&cat=${selectedClass}">첫 출근팩 전투 미리보기 ↗</a></div><span aria-hidden="true">🐾</span></div><div class="wardrobe-tabs" aria-label="꾸미기 분류">${[['all','전체'],['outfit','의상'],['effect','처치 효과'],['frame','사원증']].map(([id,name])=>`<button class="secondary-button" data-look-tab="${id}" aria-pressed="${wardrobeTab===id}">${name}</button>`).join('')}</div><div class="cosmetic-grid">${COSMETICS.filter(c=>wardrobeTab==='all'||c.slot===wardrobeTab).map(c=>cosmeticCard(c,meta,selectedClass)).join('')}</div><p class="upgrade-note">무료 보상은 완료한 근무 기록으로 해금됩니다. 판매 준비 중 상품은 미리보기 전용이며 현재 결제할 수 없습니다. 착용 기록은 이 브라우저에 저장됩니다.</p>`,hideModal);
+ openModal(`${closeButton}<div class="eyebrow">야간조 드레스룸 · ${count} / ${COSMETICS.length}</div><h2 id="modal-title">오늘은 어떤 모습으로 출근할까요?</h2><p class="modal-intro">능력치는 그대로, 내 고양이만의 분위기. 모든 의상과 효과는 전투 미리보기에서 체험할 수 있어요.</p><div class="wardrobe-pass"><strong>무료 출근 보상</strong><span>1회 근무 · 민트 스카프 ${meta.runs>=1?'✓':''}</span><span>3회 근무 · 캣닢 꽃잎 ${meta.runs>=3?'✓':''}</span><span>첫 퇴근 성공 · 사원증 ${meta.wins>=1?'✓':''}</span></div><div class="starter-preview"><div><small>판매 준비 중 · 가격 초안 3,900원</small><h3>첫 출근팩</h3><p>야간조 유니폼 + 말랑 발바닥 처치 효과 + 복숭아 사원증</p><a class="secondary-button" target="_blank" rel="noopener" href="./test-room.html?v=cat21&look=starter&cat=${selectedClass}">첫 출근팩 전투 미리보기 ↗</a></div><span aria-hidden="true">🐾</span></div><div class="wardrobe-tabs" aria-label="꾸미기 분류">${[['all','전체'],['outfit','의상'],['effect','처치 효과'],['frame','사원증']].map(([id,name])=>`<button class="secondary-button" data-look-tab="${id}" aria-pressed="${wardrobeTab===id}">${name}</button>`).join('')}</div><div class="cosmetic-grid">${COSMETICS.filter(c=>wardrobeTab==='all'||c.slot===wardrobeTab).map(c=>cosmeticCard(c,meta,selectedClass)).join('')}</div><p class="upgrade-note">무료 보상은 완료한 근무 기록으로 해금됩니다. 판매 준비 중 상품은 미리보기 전용이며 현재 결제할 수 없습니다. 착용 기록은 이 브라우저에 저장됩니다.</p>`,hideModal);
 }
 let adPending=false;
 function showRevive(){sound.setMode('paused');resetControls();saveRun();const adReady=typeof window.CatRewardedAds?.show==='function';openModal(`<div class="eyebrow">한 번 더 도전</div><h2 id="modal-title">다시 일어날까요?</h2><p class="modal-intro">체력 60% 회복 · 3초 무적 · 주변 적 밀어내기<br>한 판에 부활 1회</p><div class="modal-bottom"><button class="primary-button" data-action="revive-ticket" ${meta.collection.tickets<1?'disabled':''}>부활권 사용 (${meta.collection.tickets}장)</button>${adReady?'<button class="secondary-button" data-action="revive-ad">광고 보고 부활</button>':''}</div><p id="revive-message" class="upgrade-note" role="status">${adReady?'광고 시청 완료 후에만 부활합니다.':'부활권은 고양이 도감에서 코인으로 구매할 수 있어요.'}</p><button class="quiet-button" data-action="accept-death">이번 근무 마치기</button>`);}
@@ -74,8 +74,15 @@ function showUpgrade(choices){sound.setMode('paused');
 }
 function showSwap(){const weapons=UPGRADES.filter(u=>WEAPONS.includes(u.id)),owned=weapons.filter(u=>game.u[u.id]),missing=weapons.filter(u=>!game.u[u.id]);openModal(`${closeButton}<h2 id="modal-title">보조 무기 교체</h2><p class="modal-intro">한 판에 1회. 기존 레벨을 최대 4까지 이전합니다. 기존 무기의 진화는 사라지고 지원 강화는 유지됩니다.</p>${owned.map(u=>`<div class="guide-tip"><strong>${u.name} LV.${game.u[u.id]} → LV.${Math.min(4,game.u[u.id])}</strong><div class="modal-bottom">${missing.map(v=>`<button class="secondary-button" data-swap-from="${u.id}" data-swap-to="${v.id}">${v.name}로 교체</button>`).join('')}</div></div>`).join('')}<button class="secondary-button" data-action="back-pause">돌아가기</button>`,showPause);}
 
-function showPause(){
-  openModal(`${closeButton}<div class="eyebrow">잠깐 쉬는 시간</div><h2 id="modal-title">잠시 숨을 고르세요.</h2><div class="pause-grid"><div class="pause-stat"><b>${formatTime(game.t)}</b><span>생존 시간</span></div><div class="pause-stat"><b>${game.kills.toLocaleString()}</b><span>격파</span></div><div class="pause-stat"><b>${game.level}</b><span>레벨</span></div></div><p class="guide-tip"><strong>E · ${ACTIVE_SKILLS[game.classId].name}</strong><br>${ACTIVE_SKILLS[game.classId].desc}<br><br><strong>패시브 · ${PASSIVES[game.classId].name}</strong><br>${PASSIVES[game.classId].desc}</p><p class="guide-tip">${SYNERGIES.map(s=>s.name+" · "+s.desc).join("<br>")}</p><button class="secondary-button" data-action="swap-open" ${game.swapUsed||!game.relays.some(r=>r.active)?'disabled':''}>${game.swapUsed?'무기 교체 사용 완료':'보조 무기 교체 · 창고 개방 후 1회'}</button><div class="run-loadout">${EVOLUTIONS.filter(e=>game.evolved[e.id]).map(e=>`<span>${e.icon} ${e.name}</span>`).join('')}${Object.entries(game.u).map(([id,n])=>{const u=UPGRADES.find(u=>u.id===id);return u?`<span>${u.icon} ${u.name} ${n}</span>`:'';}).join('')||'<span>간식 조각을 모아 무기를 강화하세요.</span>'}</div><div class="settings-row"><label for="sound-toggle">게임 사운드</label><input id="sound-toggle" type="checkbox" ${meta.settings.sound?'checked':''}></div><div class="settings-row"><label for="volume-slider">음량</label><input id="volume-slider" type="range" min="0" max="100" value="${Math.round(meta.settings.volume*100)}"></div><div class="settings-row"><label for="music-volume">배경음악</label><input id="music-volume" type="range" min="0" max="100" value="${Math.round(meta.settings.musicVolume*100)}"></div><div class="settings-row"><label for="effects-volume">효과음</label><input id="effects-volume" type="range" min="0" max="100" value="${Math.round(meta.settings.effectsVolume*100)}"></div><div class="settings-row"><label for="shake-toggle">화면 흔들림</label><input id="shake-toggle" type="checkbox" ${meta.settings.shake?'checked':''}></div><div class="settings-row"><label for="particles-toggle">파티클 효과</label><input id="particles-toggle" type="checkbox" ${meta.settings.particles?'checked':''}></div><div class="modal-bottom"><button class="primary-button" data-action="resume"><span>근무 계속</span><span>↗</span></button><button class="secondary-button" data-action="guide-pause">집사 안내</button></div><button class="quiet-button" data-action="save-menu">저장하고 메뉴로</button>`,()=>game.resume());
+function showPause(page='home'){
+ const cat=CLASSES.find(c=>c.id===game.classId);
+ const tabs=`<nav class="pause-tabs" aria-label="휴식 메뉴">${[['home','휴식'],['build','장비·스킬'],['settings','설정']].map(([id,name])=>`<button data-pause-page="${id}" aria-pressed="${page===id}">${name}</button>`).join('')}</nav>`;
+ let content='';
+ if(page==='home')content=`<div class="pause-hero"><img src="./assets/cat-${cat.id}.webp" alt="${cat.name}"><strong>잠깐 쉬어도 괜찮아</strong><p>준비되면 다시 함께 출근해요.</p></div><div class="pause-grid"><div class="pause-stat"><b>${formatTime(game.t)}</b><span>생존 시간</span></div><div class="pause-stat"><b>${game.kills.toLocaleString()}</b><span>격파</span></div><div class="pause-stat"><b>${game.level}</b><span>레벨</span></div></div><button class="app-menu-row" data-action="guide-pause">조작 안내 <span>›</span></button><button class="app-menu-row" data-action="save-menu">저장하고 로비로 <span>›</span></button>`;
+ if(page==='build')content=`<div class="app-section"><h3>${ACTIVE_SKILLS[game.classId].name}</h3><p>${ACTIVE_SKILLS[game.classId].desc}</p><small>패시브 · ${PASSIVES[game.classId].name}</small><p>${PASSIVES[game.classId].desc}</p></div><div class="run-loadout">${EVOLUTIONS.filter(e=>game.evolved[e.id]).map(e=>`<span>${e.icon} ${e.name}</span>`).join('')}${Object.entries(game.u).map(([id,n])=>{const u=UPGRADES.find(u=>u.id===id);return u?`<span>${u.icon} ${u.name} ${n}</span>`:'';}).join('')||'<span>간식 조각을 모아 무기를 강화하세요.</span>'}</div><details class="app-section"><summary>시너지 도감</summary>${SYNERGIES.map(s=>`<h4>${s.name}</h4><p>${s.desc}</p>`).join('')}</details><button class="secondary-button" data-action="swap-open" ${game.swapUsed||!game.relays.some(r=>r.active)?'disabled':''}>${game.swapUsed?'무기 교체 사용 완료':'무기 교체 · 창고 개방 후 1회'}</button>`;
+ if(page==='settings')content=`<div class="settings-row"><label for="sound-toggle">게임 사운드</label><input id="sound-toggle" type="checkbox" ${meta.settings.sound?'checked':''}></div><div class="settings-row"><label for="volume-slider">음량</label><input id="volume-slider" type="range" min="0" max="100" value="${Math.round(meta.settings.volume*100)}"></div><div class="settings-row"><label for="music-volume">배경음악</label><input id="music-volume" type="range" min="0" max="100" value="${Math.round(meta.settings.musicVolume*100)}"></div><div class="settings-row"><label for="effects-volume">효과음</label><input id="effects-volume" type="range" min="0" max="100" value="${Math.round(meta.settings.effectsVolume*100)}"></div><div class="settings-row"><label for="shake-toggle">화면 흔들림</label><input id="shake-toggle" type="checkbox" ${meta.settings.shake?'checked':''}></div><div class="settings-row"><label for="particles-toggle">파티클 효과</label><input id="particles-toggle" type="checkbox" ${meta.settings.particles?'checked':''}></div>`;
+ openModal(`${closeButton}<div class="eyebrow">야간조 휴게실</div><h2 id="modal-title">${page==='home'?'잠시 쉬는 시간':page==='build'?'이번 근무의 장비':'소리와 화면'}</h2>${tabs}<div class="pause-content">${content}</div><div class="pause-footer"><button class="primary-button" data-action="resume">▶ 근무 계속하기</button></div>`,()=>game.resume());
+ $('modal').classList.add('pause-sheet');
 }
 function showGuide(fromPause=false){
   menuModal=fromPause?'guide-pause':'guide';
@@ -149,6 +156,7 @@ $('sound-btn').addEventListener('click',()=>{sound.unlock();meta.settings.sound=
 $('fullscreen-btn').addEventListener('click',async()=>{try{if(document.fullscreenElement){await document.exitFullscreen();}else if(document.documentElement.requestFullscreen)await document.documentElement.requestFullscreen();}catch{game.toast('이 브라우저에서는 전체 화면을 사용할 수 없습니다.',false,3);}});
 if(!document.documentElement.requestFullscreen)$('fullscreen-btn').classList.add('hidden');
 $('modal').addEventListener('click',e=>{
+ const pauseTab=e.target.closest('[data-pause-page]');if(pauseTab){showPause(pauseTab.dataset.pausePage);return;}
  const tab=e.target.closest('[data-look-tab]');if(tab){wardrobeTab=tab.dataset.lookTab;showWardrobe();return;}
  const look=e.target.closest('[data-equip-look]');if(look&&!look.disabled){if(equipCosmetic(meta,look.dataset.equipLook)){saveMeta();menuRefresh();showWardrobe();}return;}
   const swap=e.target.closest('[data-swap-from]');if(swap){if(game.swapWeapon(swap.dataset.swapFrom,swap.dataset.swapTo))showPause();return;}
@@ -182,7 +190,7 @@ $('overlay').addEventListener('click',e=>{if(e.target===$('overlay')&&game.state
 
 const movementCodes=['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'];
 window.addEventListener('keydown',e=>{
-  if(e.code==='Tab'&&!$('overlay').classList.contains('hidden')){const items=[...$('modal').querySelectorAll('button:not(:disabled), input, [tabindex="0"]')];if(items.length){const first=items[0],last=items[items.length-1];if(e.shiftKey&&(document.activeElement===first||document.activeElement===$('modal'))){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}return;}
+  if(e.code==='Tab'&&!$('overlay').classList.contains('hidden')){const items=[...$('modal').querySelectorAll('button:not(:disabled), input, a[href], summary, [tabindex="0"]')];if(items.length){const first=items[0],last=items[items.length-1];if(e.shiftKey&&(document.activeElement===first||document.activeElement===$('modal'))){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}return;}
   if(e.code==='Escape'||e.code==='KeyP'){if(e.repeat)return;e.preventDefault();if(game.state==='playing')game.pause();else if(modalClose)modalClose();return;}
   if(game.state==='upgrade'){const n=Number(e.code.replace(/^(Digit|Numpad)/,''));if(n>=1&&n<=3&&!e.repeat){e.preventDefault();const choice=game.choiceSet[n-1];if(choice)game.choose(choice.id);}return;}
   if(game.state!=='playing')return;
@@ -204,11 +212,11 @@ function resetControls(){resetMove();resetAimStick();hideReticle();}
 window.addEventListener('pointermove',e=>{
   if(e.pointerType!=='mouse')return;
   if(game.state!=='playing'||e.target.closest?.('button,input,[role="dialog"]')){hideReticle();return;}
-  game.aimScreen(e.clientX,e.clientY);reticle.style.left=e.clientX+'px';reticle.style.top=e.clientY+'px';reticle.classList.remove('hidden');document.body.classList.add('pointer-aim');
+  const rect=$('world').getBoundingClientRect();if(e.clientX<rect.left||e.clientX>rect.right){hideReticle();return;}game.aimScreen(e.clientX-rect.left,e.clientY-rect.top);reticle.style.left=e.clientX+'px';reticle.style.top=e.clientY+'px';reticle.classList.remove('hidden');document.body.classList.add('pointer-aim');
 });
 document.documentElement.addEventListener('pointerleave',hideReticle);
 
-function resize(){game.resize(window.innerWidth,window.innerHeight,window.devicePixelRatio||1);if(game.aim?.mode==='pointer'){game.resetAim();hideReticle();}}
+function resize(){const rect=$('world').getBoundingClientRect();game.resize(rect.width,rect.height,Math.min(2,window.devicePixelRatio||1));if(game.aim?.mode==='pointer'){game.resetAim();hideReticle();}}
 window.addEventListener('resize',resize);resize();menuRefresh();
 let previous=0,accumulator=0;
 function frame(now){requestAnimationFrame(frame);if(document.hidden){previous=now;accumulator=0;return;}const delta=previous?Math.min(.1,(now-previous)/1000):0;previous=now;if(game.state==='playing'&&game.hitStop<=0){accumulator+=delta;let steps=0;while(accumulator>=1/60&&steps<6&&game.state==='playing'){game.update(1/60);accumulator-=1/60;steps++;}}else accumulator=0;sound.setMode(game.state==='playing'?'playing':game.state);game.render(delta);if(now-lastHud>90){updateHUD();lastHud=now;}if(game.state!=='menu'&&now-lastMini>240){game.drawMinimap($('minimap'));lastMini=now;}}

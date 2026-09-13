@@ -1,4 +1,4 @@
-import {test} from 'node:test';import assert from 'node:assert/strict';import {CatGame} from '../cat-game.js?v=cat20';import {createMeta} from '../data.js?v=cat20';import {nextGoals,synergyHints} from '../build-systems.js?v=cat20';
+import {test} from 'node:test';import assert from 'node:assert/strict';import {CatGame} from '../cat-game.js?v=cat21';import {createMeta} from '../data.js?v=cat21';import {nextGoals,synergyHints} from '../build-systems.js?v=cat21';
 const make=(id='runner')=>{const g=new CatGame({getContext:()=>null},{},{play(){},ambient(){}},{particles:false});g.start(id,createMeta());g.enemies=[];g.random=()=>.99;return g;};
 const enemy=(g,x=100)=>{const e=g.spawnEnemy('brute',x,0);e.warmup=0;e.hp=e.maxHp=1000;return e;};
 test('web chain and ignition spread have real effects without recursive explosions',()=>{const g=make('spider'),a=enemy(g),b=enemy(g,130);a.slow=b.slow=2;g.damage(a,100,'arc');assert(b.hp<1000);const hp=b.hp;g.damage(a,100,'arc');assert.equal(b.hp,hp);const c=make('chef'),e=enemy(c),n=enemy(c,130);e.burn=2;c.damage(e,2000,'rocket');assert(e.dead);assert.equal(n.burn,3);assert.equal(n.hp,1000);});

@@ -1,5 +1,5 @@
-import {Game} from './game.js?v=cat20';
-import {WORLD,ENEMY_TYPES} from './data.js?v=cat20';
+import {Game} from './game.js?v=cat21';
+import {WORLD,ENEMY_TYPES} from './data.js?v=cat21';
 const TAU=Math.PI*2;
 const alpha=(c,n)=>c+Math.round(Math.max(0,Math.min(1,n))*255).toString(16).padStart(2,'0');
 function poly(c,r,n,offset=0,inner=1){c.beginPath();for(let i=0;i<n;i++){const a=i*TAU/n+offset,rr=i%2?r*inner:r;c.lineTo(Math.cos(a)*rr,Math.sin(a)*rr);}c.closePath();}

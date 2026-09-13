@@ -1,15 +1,15 @@
-import {conceptVisuals} from './concept-visuals.js?v=cat20';
-import {skillVisuals} from './skill-visuals.js?v=cat20';
-import {cosmeticVisuals,normalizeLook} from './cosmetics.js?v=cat20';
-import {buildSystems} from './build-systems.js?v=cat20';
-import {catBosses,bossProfile} from './cat-bosses.js?v=cat20';
-import {zoneFX} from './zone-fx.js?v=cat20';
-import {evolutionFX} from './evolution-fx.js?v=cat20';
-import {catSkills} from './cat-skills.js?v=cat20';
-import {EXTRA_CATS,ACTIVE_SKILLS} from './roster.js?v=cat20';
-import {SignalGame} from './interference.js?v=cat20';
-import {Game} from './game.js?v=cat20';
-import {WORLD,EVOLUTIONS} from './data.js?v=cat20';
+import {conceptVisuals} from './concept-visuals.js?v=cat21';
+import {skillVisuals} from './skill-visuals.js?v=cat21';
+import {cosmeticVisuals,normalizeLook} from './cosmetics.js?v=cat21';
+import {buildSystems} from './build-systems.js?v=cat21';
+import {catBosses,bossProfile} from './cat-bosses.js?v=cat21';
+import {zoneFX} from './zone-fx.js?v=cat21';
+import {evolutionFX} from './evolution-fx.js?v=cat21';
+import {catSkills} from './cat-skills.js?v=cat21';
+import {EXTRA_CATS,ACTIVE_SKILLS} from './roster.js?v=cat21';
+import {SignalGame} from './interference.js?v=cat21';
+import {Game} from './game.js?v=cat21';
+import {WORLD,EVOLUTIONS} from './data.js?v=cat21';
 const TAU=Math.PI*2;
 const sprites={};
 if(typeof Image!=='undefined')for(const name of ['cat-runner','cat-engineer','cat-warden','robot-cleaner','robot-toy','robot-boss',...EXTRA_CATS.map(c=>'cat-'+c.id)]){const im=new Image();im.src=new URL('./assets/'+name+'.webp',import.meta.url).href;sprites[name]=im;}

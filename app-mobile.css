@@ -20,7 +20,17 @@ body:not(.playing) .app-lobby.menu-screen{width:100%;height:calc(100dvh - 56px -
 #app .collection-card{min-width:0;border:0;box-shadow:none;border-radius:18px;background:#eaf0e7;padding:12px}#app .collection-card p{font-size:12px}#app .collection-card img{max-width:100%;height:100px;object-fit:contain}#app .collection-actions{flex-wrap:wrap}
 #app .collection-card .passive-note{background:transparent;padding:0}#app .collection-card h3{font-size:17px}#app .collection-card button{width:100%}
 #app .guide-grid{grid-template-columns:1fr}#app .guide-tip{background:#e9eee4;color:#426354;border:0;border-radius:18px;padding:16px;margin:16px 0}#app .controls-table td{color:#46635b;border-color:#d7dfd2}
-#app .choice-grid{grid-template-columns:1fr;gap:12px}#app .upgrade-card{min-height:0;padding:16px;border-radius:20px;display:grid;grid-template-columns:48px 1fr;gap:7px 12px}#app .upgrade-card .rarity,#app .upgrade-card .upgrade-bottom{grid-column:1/-1}#app .upgrade-card .big-icon{grid-row:2/5;font-size:32px}#app .upgrade-card p{margin:0;font-size:13px}#app .upgrade-card small{grid-column:2}#app .upgrade-card strong{font-size:18px}
+#app .choice-grid{grid-template-columns:minmax(0,1fr);gap:12px;width:100%;min-width:0}
+#app .upgrade-card{position:relative;min-height:0;min-width:0;width:100%;padding:16px;border-radius:20px;display:grid;grid-template-columns:42px minmax(0,1fr);grid-template-areas:"rarity rarity" "icon title" "icon description" "hint hint" "footer footer";gap:6px 12px;align-items:start;text-align:left}
+#app .upgrade-card>.rarity{grid-area:rarity;min-width:0;margin:0 0 5px;display:flex;justify-content:space-between}
+#app .upgrade-card>.big-icon{grid-area:icon;position:static;inset:auto;align-self:start;justify-self:center;margin:2px 0 0;width:42px;line-height:1.2;font-size:30px}
+#app .upgrade-card>strong{grid-area:title;min-width:0;margin:0;font-size:18px;line-height:1.45;word-break:keep-all;overflow-wrap:anywhere}
+#app .upgrade-card>p{grid-area:description;min-width:0;margin:0;font-size:13px;line-height:1.65;word-break:keep-all;overflow-wrap:anywhere}
+#app .upgrade-card>small{grid-area:hint;min-width:0;line-height:1.5;overflow-wrap:anywhere}#app .upgrade-card>small:empty{display:none}
+#app .upgrade-card>.upgrade-bottom{grid-area:footer;position:static;inset:auto;min-width:0;margin-top:8px;padding-top:8px;display:flex;justify-content:space-between;gap:8px;border-top:1px solid #e4e9ef;font-size:12px}
+#app .upgrade-card>.upgrade-bottom>span:first-child{min-width:0;overflow-wrap:anywhere}#app .upgrade-card>.upgrade-bottom>span:last-child{flex-shrink:0}
+@media(max-width:360px){#app .modal{padding-left:16px;padding-right:16px}#app .upgrade-card{padding:13px;grid-template-columns:36px minmax(0,1fr);column-gap:10px}#app .upgrade-card>.big-icon{width:36px;font-size:27px}#app .upgrade-card>strong{font-size:17px}}
+
 #app .pause-sheet{display:flex;flex-direction:column;overflow:hidden;padding-bottom:0}#app .pause-sheet .modal-close{position:absolute;top:calc(20px + env(safe-area-inset-top));right:20px;float:none}
 .pause-tabs{display:grid;grid-template-columns:repeat(3,1fr);padding:4px;background:#e3e9df;border-radius:16px;gap:4px;flex-shrink:0}.pause-tabs button{border:0;background:transparent;color:#537164;border-radius:12px;font-weight:700}.pause-tabs [aria-pressed=true]{background:#fffdf6;color:#225d50;box-shadow:0 2px 8px #23482e12}
 .pause-content{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:18px 0;scrollbar-width:thin}.pause-hero{text-align:center;margin-bottom:20px}.pause-hero img{height:130px;width:150px;object-fit:contain;display:block;margin:auto}.pause-hero strong{display:block;font-size:21px}.pause-hero p{font-size:13px;margin:6px 0}

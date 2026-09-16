@@ -45,3 +45,53 @@ body:not(.playing) .app-lobby.menu-screen{width:100%;height:calc(100dvh - 56px -
 .touch-zone,.aim-zone{display:block;position:absolute;bottom:calc(175px + env(safe-area-inset-bottom));width:46%;height:24%;pointer-events:auto;touch-action:none;z-index:1}.touch-zone{left:0}.aim-zone{right:0}#stick-base,#aim-stick-base{position:absolute;display:flex;align-items:center;justify-content:center;width:92px;height:92px;bottom:16px;border:1px solid #b7e7d855;border-radius:50%;background:#244e4933}#stick-base{left:20px}#aim-stick-base{left:auto;right:20px}#stick-knob,#aim-stick-knob{width:36px;height:36px;border-radius:50%;background:#add8b638;border:1px solid #d4eed888}.touch-zone>span,.aim-zone>span{position:absolute;bottom:0;font-size:11px;color:#d0e6d3}.touch-zone>span{left:34px}.aim-zone>span{left:auto;right:34px}.relay-progress{top:225px;bottom:auto;width:220px}.toast{top:31%;max-width:85%;font-size:13px}
 @media(max-height:650px){.pause-hero img{height:80px}.pause-content{padding:10px 0}.pause-hero{margin-bottom:10px}.pause-hero p{display:none}.lobby-stage{min-height:185px!important;height:185px}.lobby-cat{width:185px!important;height:185px!important}.touch-zone,.aim-zone{bottom:125px;height:25%}.weapon-dock{display:none}.signal-hud{bottom:90px}.ability-dock{bottom:12px}.ability{height:54px}#minimap{display:none}.boss-hud{top:155px}.relay-progress{top:200px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+
+/* Fit the lobby to the visible WebView, including browser bars and safe areas. */
+body:not(.playing) .app-lobby.menu-screen{overflow:hidden;padding:0 18px;display:flex;flex-direction:column;gap:0}
+.app-lobby .lobby-wallet{flex:none;min-height:28px;padding:0;font-size:11px}
+.app-lobby .lobby-wallet>div{padding:4px 10px}
+#app .app-lobby .lobby-stage{flex:1 1 0;min-height:0!important;height:auto;margin:0;overflow:hidden}
+#app .app-lobby .lobby-cat{height:calc(100% - 30px)!important;width:auto!important;max-width:75%;max-height:330px;bottom:26px;object-fit:contain}
+#app .app-lobby .lobby-stage-title{top:6px!important;pointer-events:none}
+#app .app-lobby h1{font-size:clamp(23px,6vw,30px);margin:4px 0}
+#app .app-lobby .lobby-status{font-size:10px}
+#app .app-lobby .lobby-help{top:4px}
+#app .app-lobby .lobby-cat-label{max-width:100%;gap:2px;bottom:3px}
+#app .app-lobby .lobby-cat-label strong{font-size:clamp(18px,5vw,24px);line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#app .app-lobby .lobby-cat-label span{font-size:11px}
+#app .app-lobby .lobby-controls{flex:none;padding:6px 0 0;min-width:0}
+#app .app-lobby .lobby-section-title{margin-bottom:4px}
+#app .app-lobby .class-picker{gap:12px;padding:3px 3px 5px}
+#app .app-lobby .class-card{flex-basis:64px;min-height:78px}
+#app .app-lobby .cat-portrait{width:54px;height:54px}
+#app .app-lobby .class-card strong{font-size:12px;margin-top:3px}
+#app .app-lobby .selection-mark{top:37px;right:2px}
+#app .app-lobby .lobby-mission{padding:4px 0 8px;gap:7px}
+#app .app-lobby .lobby-mission strong{font-size:14px}
+#app .app-lobby .lobby-mission small{font-size:10px;line-height:1.3}
+#app .app-lobby .start-row{gap:8px;align-items:stretch}
+#app .app-lobby #start-btn,#app .app-lobby #continue-btn,#app .app-lobby #special-btn{display:flex;align-items:center;justify-content:center;gap:12px;min-height:50px;padding:8px 12px;border:1px solid #ffedb0;border-bottom:4px solid #b58036;border-radius:18px;background:linear-gradient(180deg,#ffe5a0,#f7c56b);color:#493817;font-size:19px;line-height:1.2;font-weight:900;text-decoration:none;box-shadow:0 3px 0 #33271533;margin:0;min-width:0}
+#app .app-lobby #start-btn,#app .app-lobby #continue-btn{flex:1;width:0}
+#app .app-lobby #continue-btn{background:linear-gradient(180deg,#d6f3d9,#9ddcbd);border-color:#e0f9e5;border-bottom-color:#518d76;color:#204d40;font-size:17px}
+#app .app-lobby #special-btn{width:100%;margin-top:8px;background:linear-gradient(180deg,#ffe2bb,#ffc182);border-color:#fff0d5;border-bottom-color:#b78048;font-size:16px;justify-content:space-between}
+#app .app-lobby #special-btn small{font-size:11px;font-weight:600;margin-left:auto;white-space:nowrap}
+#app .app-lobby .test-room-link{min-height:44px;display:flex;align-items:center;justify-content:center;padding:4px;font-size:12px}
+#app .app-lobby .lobby-record{display:none}
+#app .app-lobby .lobby-tabs{position:relative;left:auto;bottom:auto;transform:none;width:calc(100% + 36px);margin:0 -18px;flex:none;padding:5px 10px calc(5px + env(safe-area-inset-bottom));gap:0}
+#app .app-lobby .lobby-tabs button{min-height:48px;padding:3px;gap:3px}
+#app .app-lobby .lobby-tabs button>span{font-size:23px}
+#app .app-lobby .lobby-tabs strong{font-size:11px}
+@media(max-height:620px){
+ #app .app-lobby .class-card{min-height:65px;flex-basis:58px}
+ #app .app-lobby .cat-portrait{width:44px;height:44px}
+ #app .app-lobby .selection-mark{top:28px}
+ #app .app-lobby .lobby-wallet{display:none}
+ #app .app-lobby .lobby-mission small{display:none}
+ #app .app-lobby #start-btn,#app .app-lobby #continue-btn,#app .app-lobby #special-btn{min-height:44px}
+ #app .app-lobby .lobby-stage-title h1{font-size:22px}
+}
+@media(max-height:450px){
+ #app .app-lobby .lobby-stage-title,#app .app-lobby .lobby-cat,#app .app-lobby .lobby-cat-label{display:none}
+ #app .app-lobby .lobby-stage{min-height:44px!important}
+ #app .app-lobby .lobby-mission,#app .app-lobby .lobby-section-title{display:none}
+}

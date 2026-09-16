@@ -6,16 +6,43 @@ export const COSMETICS=[
 {id:'leaf',slot:'effect',name:'캣닢 꽃잎',icon:'🌿',hint:'근무 3회 완료',stat:'runs',target:3},
 {id:'paw',slot:'effect',name:'말랑 발바닥',icon:'🐾',hint:'첫 출근팩 · 판매 준비 중',premium:true},
 {id:'star',slot:'effect',name:'별사탕 톡톡',icon:'✨',hint:'개별 상품 · 판매 준비 중',premium:true},
-{id:'bell',slot:'effect',name:'방울 잔향',icon:'🔔',hint:'개별 상품 · 판매 준비 중',premium:true},
-{id:'simple',slot:'frame',name:'기본 사원증',icon:'🪪',hint:'기본 지급'},
-{id:'clover',slot:'frame',name:'무사 퇴근 사원증',icon:'🍀',hint:'퇴근 성공 1회',stat:'wins',target:1},
-{id:'peach',slot:'frame',name:'복숭아 사원증',icon:'🌸',hint:'첫 출근팩 · 판매 준비 중',premium:true}];
+{id:'bell',slot:'effect',name:'파란 방울',icon:'🔔',hint:'개별 상품 · 판매 준비 중',premium:true},
+{id:'simple',slot:'frame',name:'기본 이름표',icon:'🪪',hint:'기본 지급'},
+{id:'clover',slot:'frame',name:'무사 퇴근 이름표',icon:'🍀',hint:'퇴근 성공 1회',stat:'wins',target:1},
+{id:'peach',slot:'frame',name:'복숭아빛 이름표',icon:'🌸',hint:'첫 출근팩 · 판매 준비 중',premium:true}];
+export const COSMETIC_DETAILS={
+plain:'고양이의 기본 모습입니다. 의상 장식을 표시하지 않습니다.',
+scarf:'로비와 전투에서 고양이 몸에 민트색 스카프를 표시합니다.',
+uniform:'로비와 전투에서 민트색 유니폼과 작은 명찰을 표시합니다.',
+crumb:'적 처치 위치에 노란 간식 부스러기가 흩어집니다.',
+leaf:'적 처치 위치에 연두색 잎사귀가 흩어집니다.',
+paw:'적 처치 위치에 분홍색 발바닥이 흩어집니다.',
+star:'적 처치 위치에 노란 별사탕이 흩어집니다.',
+bell:'적 처치 위치에 하늘색 방울이 흩어집니다. 전용 소리는 없습니다.',
+simple:'로비의 고양이 이름표를 기본 모양으로 표시합니다.',
+clover:'로비의 고양이 이름표에 연두색 테두리를 표시합니다.',
+peach:'로비의 고양이 이름표에 분홍색 테두리를 표시합니다. 출입권이 아닙니다.'
+};
+export const SLOT_LABELS={outfit:'의상 · 로비/전투',effect:'처치 효과 · 적을 잡을 때',frame:'이름표 · 로비'};
+// Keep original asset separate from the composited portrait to prevent stacking outfits.
+const portraits=new Map();
+export function applyLobbyOutfit(element,cat,outfit){
+ const src='./assets/cat-'+cat+'.webp',key=cat+':'+outfit;element.dataset.portraitKey=key;
+ if(outfit==='plain'){element.src=src;return;}
+ let im=portraits.get(src);if(!im){im=new Image();im.src=src;portraits.set(src,im);}
+ const draw=()=>{if(element.dataset.portraitKey!==key||!im.naturalWidth)return;
+ const canvas=document.createElement('canvas');canvas.width=im.naturalWidth;canvas.height=im.naturalHeight;
+ const c=canvas.getContext('2d');c.drawImage(im,0,0);const scale=canvas.height/54;c.scale(scale,scale);
+ cosmeticVisuals.drawOutfit.call({cosmetics:{outfit}},c,canvas.width/scale/2,54*.69);
+ element.src=canvas.toDataURL('image/png');};
+ if(im.complete&&im.naturalWidth)draw();else{element.src=src;im.addEventListener('load',draw,{once:true});}
+}
 export const DEFAULT_LOOK={outfit:'plain',effect:'crumb',frame:'simple'};
 export const hasCosmetic=(meta,item)=>!item.premium&&(!item.stat||(meta[item.stat]||0)>=item.target);
 export function normalizeLook(raw,meta){return Object.fromEntries(Object.entries(DEFAULT_LOOK).map(([slot,fallback])=>{const item=COSMETICS.find(c=>c.id===raw?.[slot]&&c.slot===slot);return [slot,item&&hasCosmetic(meta,item)?item.id:fallback];}));}
 export function equipCosmetic(meta,id){const item=COSMETICS.find(c=>c.id===id);if(!item||!hasCosmetic(meta,item))return false;meta.cosmetics=normalizeLook(meta.cosmetics,meta);meta.cosmetics[item.slot]=id;return true;}
 export function previewLook(id){const look={...DEFAULT_LOOK};if(id==='starter')return {outfit:'uniform',effect:'paw',frame:'peach'};const item=COSMETICS.find(c=>c.id===id);if(item)look[item.slot]=id;return look;}
-export function cosmeticCard(c,meta,cat){const has=hasCosmetic(meta,c),equipped=meta.cosmetics[c.slot]===c.id;return `<article class="cosmetic-card"><div class="cosmetic-art art-${c.id}" aria-hidden="true">${c.icon}</div><small>${c.premium?'미리보기 전용':has?'보유 중':'플레이 보상'}</small><h3>${c.name}</h3><p>${c.hint}${c.stat&&!has?` · ${Math.min(meta[c.stat]||0,c.target)}/${c.target}`:''}</p><div class="cosmetic-actions"><a class="secondary-button" target="_blank" rel="noopener" href="./test-room.html?v=cat21&look=${c.id}&cat=${cat}">전투 미리보기 ↗</a>${has?`<button class="primary-button" data-equip-look="${c.id}" ${equipped?'disabled':''}>${equipped?'착용 중':'착용'}</button>`:''}</div></article>`;}
+export function cosmeticCard(c,meta,cat){const has=hasCosmetic(meta,c),equipped=meta.cosmetics[c.slot]===c.id;return `<article class="cosmetic-card"><div class="cosmetic-art art-${c.id}" aria-hidden="true">${c.icon}</div><small>${c.premium?'미리보기 전용':has?'보유 중':'플레이 보상'}</small><h3>${c.name}</h3><p class="cosmetic-description"><b>${SLOT_LABELS[c.slot]}</b><br>${COSMETIC_DETAILS[c.id]}</p><p>${c.hint}${c.stat&&!has?` · ${Math.min(meta[c.stat]||0,c.target)}/${c.target}`:''}</p><div class="cosmetic-actions"><a class="secondary-button" target="_blank" rel="noopener" href="./test-room.html?v=cat23&look=${c.id}&cat=${cat}">적용 모습 보기 ↗</a>${has?`<button class="primary-button" data-equip-look="${c.id}" ${equipped?'disabled':''}>${equipped?'착용 중':'착용'}</button>`:''}</div></article>`;}
 function shape(c,id,size){c.beginPath();if(id==='paw'){c.ellipse(0,2,size*.55,size*.42,0,0,Math.PI*2);c.fill();for(let i=0;i<3;i++){c.beginPath();c.arc((i-1)*size*.5,-size*.45,size*.22,0,Math.PI*2);c.fill();}}else if(id==='star'){for(let i=0;i<10;i++){const a=i*Math.PI/5-Math.PI/2,r=i%2?size*.45:size;c.lineTo(Math.cos(a)*r,Math.sin(a)*r);}c.closePath();c.fill();}else if(id==='bell'){c.arc(0,0,size,Math.PI,0);c.lineTo(size,size*.5);c.lineTo(-size,size*.5);c.closePath();c.stroke();c.beginPath();c.arc(0,size*.65,2,0,Math.PI*2);c.fill();}else if(id==='leaf'){c.ellipse(0,0,size*.45,size,Math.PI/4,0,Math.PI*2);c.fill();}else{c.moveTo(-size,-size*.6);c.lineTo(size,-size*.3);c.lineTo(size*.4,size);c.closePath();c.fill();}}
 export const cosmeticVisuals={
  emitCosmetic(e){this.cosmeticFX??=[];if(this.cosmeticFX.length>=36)return;this.cosmeticFX.push({x:e.x,y:e.y,id:this.cosmetics?.effect||'crumb',life:.45});},

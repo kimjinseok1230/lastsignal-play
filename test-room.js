@@ -1,14 +1,14 @@
-import {COSMETICS,previewLook} from './cosmetics.js?v=cat21';
+import {COSMETICS,COSMETIC_DETAILS,SLOT_LABELS,previewLook} from './cosmetics.js?v=cat23';
 import {endingScene} from './ending-scene.js?v=2';
 import {TestGame} from './test-game.js?v=9';
-import {CLASSES,WEAPONS,UPGRADES,EVOLUTIONS,formatTime} from './data.js?v=cat21';
-import {ACTIVE_SKILLS} from './roster.js?v=cat21';
-import {Sound} from './audio.js?v=cat21';
+import {CLASSES,WEAPONS,UPGRADES,EVOLUTIONS,formatTime} from './data.js?v=cat23';
+import {ACTIVE_SKILLS} from './roster.js?v=cat23';
+import {Sound} from './audio.js?v=cat23';
 const $=id=>document.getElementById(id),settings={sound:true,volume:.55,musicVolume:.4,effectsVolume:.8,particles:true,shake:true},sound=new Sound(settings);
 let toastUntil=0;const g=new TestGame($('world'),{toast:message=>{$('notice').textContent=message;toastUntil=performance.now()+2400;}},sound,settings);
 $('cat').innerHTML=CLASSES.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');$('weapon').innerHTML='<option value="none">전용 스킬만 테스트</option>'+WEAPONS.map(id=>`<option value="${id}">${UPGRADES.find(u=>u.id===id).name}</option>`).join('');$('weapon').value='orbit';
 function equip(){g.equip($('weapon').value,$('stage').value);const e=EVOLUTIONS.find(e=>e.weapon===$('weapon').value&&Boolean(e.requires)===($('stage').value==='2'));$('weapon-info').textContent=$('weapon').value==='none'?'E 버튼으로 고양이 전용 스킬을 사용하세요.':$('stage').value==='0'?'진화 전 상태입니다. 진화 단계 변경 후 같은 적을 소환해 비교하세요.':e.name+' · '+e.desc;g.spawnGroup('stalker',8);}
-function applyPreview(){g.cosmetics=previewLook($('cosmetic-preview').value);$('preview-badge').dataset.frame=g.cosmetics.frame;$('preview-badge').textContent=COSMETICS.find(c=>c.id===g.cosmetics.frame).name;$('cosmetic-info').textContent='미리보기 전용 · 능력치 변경이나 보유 아이템 지급 없이 체험합니다.';}
+function applyPreview(){g.cosmetics=previewLook($('cosmetic-preview').value);$('preview-badge').dataset.frame=g.cosmetics.frame;$('preview-badge').textContent=COSMETICS.find(c=>c.id===g.cosmetics.frame).name;const item=COSMETICS.find(c=>c.id===$('cosmetic-preview').value);$('cosmetic-info').textContent=(item?SLOT_LABELS[item.slot]+' · '+COSMETIC_DETAILS[item.id]:'유니폼 + 분홍 발바닥 처치 효과 + 분홍 이름표 테두리')+' · 미리보기 전용 / 능력치 변경·아이템 지급 없음';}
 function start(){g.startTest($('cat').value);applyPreview();g.primaryEnabled=$('primary').checked;equip();$('time').value='0';$('skill').textContent=ACTIVE_SKILLS[g.classId].name;$('skill-info').textContent=ACTIVE_SKILLS[g.classId].desc;sound.setMode('playing');}
 $('cat').onchange=start;$('weapon').onchange=equip;$('stage').onchange=equip;
 for(const [id,key] of [['god','invincible'],['cooldown','noCooldown'],['auto','autoAim'],['primary','primaryEnabled']])$(id).onchange=()=>g[key]=$(id).checked;
@@ -29,3 +29,5 @@ function drawEndingPreview(){previewData.classId=g.classId;$('ending-content').i
 $('ending-preview').onclick=()=>{if(g.state==='playing')g.pause();previewStep=0;drawEndingPreview();$('ending-dialog').showModal();};$('ending-close').onclick=()=>$('ending-dialog').close();$('ending-content').onclick=e=>{const a=e.target.closest('[data-action]')?.dataset.action;if(a==='ending-next'&&previewStep<2){previewStep++;drawEndingPreview();}else if(a)$('ending-dialog').close();};
 
 $('synergy').onchange=()=>{const presets={web:['spider',{arc:5}],fire:['chef',{rocket:5}],drone:['engineer',{orbit:5,rail:5}],ice:['frost',{field:5,crit:4}]},v=presets[$('synergy').value];if(!v)return;$('cat').value=v[0];start();g.equip('none',0);g.u=v[1];g.recalculate();g.primaryEnabled=true;$('primary').checked=true;$('weapon').value='none';$('stage').value='0';$('weapon-info').textContent='시너지 프리셋 적용 · E 스킬과 기본 공격을 함께 사용하세요.';g.spawnGroup('brute',20);};
+
+$('preview-effect').onclick=()=>{g.emitCosmetic({x:g.player.x,y:g.player.y-45});if(g.state==='paused')g.resume();};

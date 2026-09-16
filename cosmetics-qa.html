@@ -1,0 +1,12 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>야근냥 꾸미기 QA</title>
+<link rel="stylesheet" href="./cat-theme.css?v=cat23">
+<style>body{margin:20px;background:#f7f5ed;color:#203d40;font:15px system-ui}main{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px}article{padding:16px;border:1px solid #ccd8d0;border-radius:16px;background:white}img{width:130px;height:130px;object-fit:contain}canvas{width:100px;height:100px;background:#213e3b;border-radius:12px}.lobby-cat-label{position:static!important;color:#fff;background:#203d40;padding:9px!important}button{min-height:44px}h1{font-size:24px}</style>
+<h1>꾸미기 11종 적용 QA</h1><p>실제 렌더러 사용 · 전투 효과는 중간 프레임으로 고정 · 게임 저장 변경 없음</p><p id="status"></p><main></main>
+<script type="module">
+import {COSMETICS,COSMETIC_DETAILS,previewLook,cosmeticVisuals,applyLobbyOutfit,equipCosmetic} from './cosmetics.js?v=cat23';
+import {createMeta,normalizeMeta} from './data.js?v=cat23';
+const meta=createMeta();meta.runs=3;meta.wins=1;
+const root=document.querySelector('main');
+for(const item of COSMETICS){const look=previewLook(item.id),a=document.createElement('article');a.innerHTML=`<h2>${item.name}</h2><img alt="${item.name} 의상"><canvas width="200" height="200" aria-label="${item.name} 처치 효과"></canvas><div class="lobby-cat-label" data-frame="${look.frame}">치즈 · 이름표</div><p>${COSMETIC_DETAILS[item.id]}</p><button>${item.premium?'착용 차단 확인':'착용·저장 복원 확인'}</button><output></output>`;root.append(a);applyLobbyOutfit(a.querySelector('img'),'runner',look.outfit);const c=a.querySelector('canvas').getContext('2d');c.scale(2,2);cosmeticVisuals.drawCosmeticEffects.call({cosmeticFX:[{x:50,y:50,id:look.effect,life:.3}],settings:{particles:true},visible:()=>true},c);a.querySelector('button').onclick=()=>{const ok=equipCosmetic(meta,item.id);const restored=normalizeMeta(JSON.parse(JSON.stringify(meta)));a.querySelector('output').textContent=(item.premium?!ok:ok&&restored.cosmetics[item.slot]===item.id)?' 통과':' 실패';};}
+document.querySelector('#status').textContent=`${COSMETICS.length}종 · 무료 6종 착용/복원 · 판매 예정 5종 미리보기/착용 차단`;
+</script></html>

@@ -1,19 +1,25 @@
-import {COSMETICS,hasCosmetic,equipCosmetic,cosmeticCard,applyLobbyOutfit} from './cosmetics.js?v=cat24';
-import {SYNERGIES,synergyHints,nextGoals} from './build-systems.js?v=cat24';
+import {specialState,refill,reserve,refund,settle,configureSpecial,REFILL_MS} from './special-shift.js?v=cat25';
+import {COSMETICS,hasCosmetic,equipCosmetic,cosmeticCard,applyLobbyOutfit} from './cosmetics.js?v=cat25';
+import {SYNERGIES,synergyHints,nextGoals} from './build-systems.js?v=cat25';
 import {endingScene} from './ending-scene.js?v=2';
-import {bossProfile} from './cat-bosses.js?v=cat24';
-import {missionUnlocks,buyCat,buyTicket,drawCat,DRAW_COST,TICKET_COST,PASSIVES,ACTIVE_SKILLS} from './roster.js?v=cat24';
-import {bindStick} from './aim.js?v=cat24';
-import {SignalGame as Game} from './cat-game.js?v=cat24';
-import {Sound} from './audio.js?v=cat24';
-import {CLASSES,UPGRADES,EVOLUTIONS,BASE_UPGRADES,DURATION,WEAPONS,PROTOCOLS,createMeta,normalizeMeta,formatTime,xpRequired} from './data.js?v=cat24';
+import {bossProfile} from './cat-bosses.js?v=cat25';
+import {missionUnlocks,buyCat,buyTicket,drawCat,DRAW_COST,TICKET_COST,PASSIVES,ACTIVE_SKILLS} from './roster.js?v=cat25';
+import {bindStick} from './aim.js?v=cat25';
+import {SignalGame as Game} from './cat-game.js?v=cat25';
+import {Sound} from './audio.js?v=cat25';
+import {CLASSES,UPGRADES,EVOLUTIONS,BASE_UPGRADES,DURATION,WEAPONS,PROTOCOLS,createMeta,normalizeMeta,formatTime,xpRequired} from './data.js?v=cat25';
 
 const $=id=>document.getElementById(id);
 const STORAGE='night-shift-cats-v1',RUN_STORAGE=STORAGE+'-run';
 let storageOK=true;
 function read(key){try{const raw=localStorage.getItem(key);return raw?JSON.parse(raw):null;}catch{return null;}}
 function write(key,value){try{if(value===null)localStorage.removeItem(key);else localStorage.setItem(key,JSON.stringify(value));}catch{if(storageOK){storageOK=false;$('save-notice').classList.remove('hidden');setTimeout(()=>$('save-notice').classList.add('hidden'),6500);}}}
-const meta=normalizeMeta(read(STORAGE));
+const SPECIAL_STORAGE=STORAGE+'-special';
+const special=specialState(read(SPECIAL_STORAGE));
+if(special.pending&&!special.run)refund(special);
+const meta=normalizeMeta({...read(STORAGE),specialShards:special.shards});
+function saveSpecial(){write(SPECIAL_STORAGE,special);}
+saveSpecial();
 missionUnlocks(meta);
 let savedRun=read(RUN_STORAGE),selectedClass=meta.collection.owned.includes(read(STORAGE+'-selected'))?read(STORAGE+'-selected'):'runner',modalClose=null,toastTimer=null,lastDock='',lastObjective='',lastHud=0,lastMini=0,menuModal='',result=null,priorFocus=null;
 const sound=new Sound(meta.settings);
@@ -29,7 +35,7 @@ const game=new Game($('world'),{
 },sound,meta.settings);
 
 function saveMeta(){write(STORAGE,meta);}
-function saveRun(){const data=game.serialize();if(data){savedRun=data;write(RUN_STORAGE,data);}}
+function saveRun(){const data=game.serialize();if(!data)return;if(game.mode==='special'){if(special.pending===game.runId){special.run=data;saveSpecial();}return;}savedRun=data;write(RUN_STORAGE,data);}
 function hideModal(){const wasVisible=!$('overlay').classList.contains('hidden');$('overlay').classList.add('hidden');document.body.classList.remove('sheet-open');modalClose=null;menuModal='';if(wasVisible&&priorFocus?.isConnected&&game.state==='menu')priorFocus.focus();}
 function openModal(html,onClose=null){priorFocus=document.activeElement;$('modal').classList.remove('pause-sheet');$('modal').innerHTML=html;$('modal').scrollTop=0;$('overlay').classList.remove('hidden');document.body.classList.add('sheet-open');modalClose=onClose;requestAnimationFrame(()=>$('modal').focus());}
 const closeButton='<button class="modal-close" data-action="close" aria-label="닫기">×</button>';
@@ -41,7 +47,7 @@ function showCollection(message=''){
 let wardrobeTab='all';
 function showWardrobe(){
  const count=COSMETICS.filter(c=>hasCosmetic(meta,c)).length;
- openModal(`${closeButton}<div class="eyebrow">야간조 드레스룸 · ${count} / ${COSMETICS.length}</div><h2 id="modal-title">오늘은 어떤 모습으로 출근할까요?</h2><p class="modal-intro">공격력·체력 변화 없음. 의상은 로비와 전투, 이름표는 로비, 처치 효과는 적을 잡을 때 적용됩니다. 모든 의상과 효과는 전투 미리보기에서 체험할 수 있어요.</p><div class="wardrobe-pass"><strong>무료 출근 보상</strong><span>1회 근무 · 민트 스카프 ${meta.runs>=1?'✓':''}</span><span>3회 근무 · 캣닢 꽃잎 ${meta.runs>=3?'✓':''}</span><span>첫 퇴근 성공 · 이름표 ${meta.wins>=1?'✓':''}</span></div><div class="starter-preview"><div><small>판매 준비 중 · 가격 초안 3,900원</small><h3>첫 출근팩 · 꾸미기 3종</h3><p>야간조 유니폼 + 말랑 발바닥 처치 효과 + 복숭아빛 이름표</p><a class="secondary-button" target="_blank" rel="noopener" href="./test-room.html?v=cat24&look=starter&cat=${selectedClass}">첫 출근팩 전투 미리보기 ↗</a></div><span aria-hidden="true">🐾</span></div><div class="wardrobe-tabs" aria-label="꾸미기 분류">${[['all','전체'],['outfit','의상'],['effect','처치 효과'],['frame','이름표']].map(([id,name])=>`<button class="secondary-button" data-look-tab="${id}" aria-pressed="${wardrobeTab===id}">${name}</button>`).join('')}</div><div class="cosmetic-grid">${COSMETICS.filter(c=>wardrobeTab==='all'||c.slot===wardrobeTab).map(c=>cosmeticCard(c,meta,selectedClass)).join('')}</div><p class="upgrade-note">무료 보상은 완료한 근무 기록으로 해금됩니다. 판매 준비 중 상품은 미리보기 전용이며 현재 결제할 수 없습니다. 착용 기록은 이 브라우저에 저장됩니다.</p>`,hideModal);
+ openModal(`${closeButton}<div class="eyebrow">야간조 드레스룸 · ${count} / ${COSMETICS.length}</div><h2 id="modal-title">오늘은 어떤 모습으로 출근할까요?</h2><p class="modal-intro">공격력·체력 변화 없음. 의상은 로비와 전투, 이름표는 로비, 처치 효과는 적을 잡을 때 적용됩니다. 모든 의상과 효과는 전투 미리보기에서 체험할 수 있어요.</p><div class="wardrobe-pass"><strong>무료 출근 보상</strong><span>1회 근무 · 민트 스카프 ${meta.runs>=1?'✓':''}</span><span>3회 근무 · 캣닢 꽃잎 ${meta.runs>=3?'✓':''}</span><span>첫 퇴근 성공 · 이름표 ${meta.wins>=1?'✓':''}</span></div><div class="starter-preview"><div><small>판매 준비 중 · 가격 초안 3,900원</small><h3>첫 출근팩 · 꾸미기 3종</h3><p>야간조 유니폼 + 말랑 발바닥 처치 효과 + 복숭아빛 이름표</p><a class="secondary-button" target="_blank" rel="noopener" href="./test-room.html?v=cat25&look=starter&cat=${selectedClass}">첫 출근팩 전투 미리보기 ↗</a></div><span aria-hidden="true">🐾</span></div><div class="wardrobe-tabs" aria-label="꾸미기 분류">${[['all','전체'],['outfit','의상'],['effect','처치 효과'],['frame','이름표']].map(([id,name])=>`<button class="secondary-button" data-look-tab="${id}" aria-pressed="${wardrobeTab===id}">${name}</button>`).join('')}</div><div class="cosmetic-grid">${COSMETICS.filter(c=>wardrobeTab==='all'||c.slot===wardrobeTab).map(c=>cosmeticCard(c,meta,selectedClass)).join('')}</div><p class="upgrade-note">무료 보상은 완료한 근무 기록으로 해금됩니다. 판매 준비 중 상품은 미리보기 전용이며 현재 결제할 수 없습니다. 착용 기록은 이 브라우저에 저장됩니다.</p>`,hideModal);
 }
 let adPending=false;
 function showRevive(){sound.setMode('paused');resetControls();saveRun();const adReady=typeof window.CatRewardedAds?.show==='function';openModal(`<div class="eyebrow">한 번 더 도전</div><h2 id="modal-title">다시 일어날까요?</h2><p class="modal-intro">체력 60% 회복 · 3초 무적 · 주변 적 밀어내기<br>한 판에 부활 1회</p><div class="modal-bottom"><button class="primary-button" data-action="revive-ticket" ${meta.collection.tickets<1?'disabled':''}>부활권 사용 (${meta.collection.tickets}장)</button>${adReady?'<button class="secondary-button" data-action="revive-ad">광고 보고 부활</button>':''}</div><p id="revive-message" class="upgrade-note" role="status">${adReady?'광고 시청 완료 후에만 부활합니다.':'부활권은 고양이 도감에서 코인으로 구매할 수 있어요.'}</p><button class="quiet-button" data-action="accept-death">이번 근무 마치기</button>`);}
@@ -63,6 +69,29 @@ function menuRefresh(){
 }
 function updateSound(){$('sound-btn').innerHTML=`${meta.settings.sound?'♫':'♪'} <span>${meta.settings.sound?'ON':'OFF'}</span>`;$('sound-btn').setAttribute('aria-label',meta.settings.sound?'소리 끄기':'소리 켜기');$('sound-btn').setAttribute('aria-pressed',String(meta.settings.sound));sound.sync();}
 function beginRun(difficulty=0){if(!owned(selectedClass))return;sound.unlock();sound.play('click');savedRun=null;write(RUN_STORAGE,null);game.start(selectedClass,meta,difficulty);saveRun();}
+function showSpecial(){
+ refill(special);saveSpecial();
+ const wait=special.tickets>=3?'무료 출근권이 모두 찼어요':`다음 출근권 ${formatTime(Math.ceil(Math.max(0,REFILL_MS-(Date.now()-special.clock))/1000))}`;
+ const rewards=[['새벽빛 이름표',4],['오로라 이름표',12],['베테랑 이름표',24]];
+ openModal(`${closeButton}<div class="eyebrow">짧게 즐기는 특별 근무</div><h2 id="modal-title">새벽 진열대 지키기</h2><p class="modal-intro">4분 동안 생존하세요. 1분마다 꾸미기 도장 1개 · 최대 4개. 일반 근무 보상과 기록에는 영향을 주지 않습니다.</p><div class="guide-tip"><strong id="special-ticket-count">무료 출근권 ${special.tickets} / 3${special.pending?' · 사용 중 1장':''}</strong><p id="special-clock">${wait}</p><small>2시간마다 1장 회복 · 최대 3장 · 첫 도전에서 실패하면 출근권 1장 반환</small></div><h3>꾸미기 도장 ${special.shards}개</h3><p>도장은 누적됩니다. 달성한 이름표는 꾸미기에서 착용하세요.</p><div class="run-loadout">${rewards.map(([name,n])=>`<span>${name} · ${special.shards>=n?'해금 완료':`${special.shards}/${n}`}</span>`).join('')}</div><p>완료 ${special.completed}회 · 성공 ${special.wins}회</p><div class="modal-bottom">${special.pending?'<button class="primary-button" data-action="special-continue">특별 근무 이어하기</button>':`<button class="primary-button" data-action="special-start" ${special.tickets<1?'disabled':''}>출근권 1장으로 시작</button>`}<button class="secondary-button" data-action="normal-from-special">일반 근무 · 무제한</button></div>${special.pending?'<button class="quiet-button" data-action="special-abandon-ask">진행 중인 특별 근무 포기</button>':''}<p class="upgrade-note">출근권과 부활권은 다른 아이템입니다. 특별 근무는 부활권을 사용하지 않습니다. 광고·유료 출근권·구독은 아직 제공하지 않습니다.</p>`,hideModal);menuModal='special';
+}
+function beginSpecial(){
+ if(!owned(selectedClass)||!storageOK||special.pending)return;
+ if(!reserve(special,'starting')){showSpecial();return;}saveSpecial();
+ if(!storageOK){refund(special);showSpecial();return;}
+ sound.unlock();game.start(selectedClass,meta,0);configureSpecial(game);special.pending=game.runId;saveRun();updateHUD(true);
+}
+function continueSpecial(){
+ if(!special.pending||!special.run){showSpecial();return;}
+ sound.unlock();game.cosmetics={...meta.cosmetics};
+ if(special.run.cats?.mode!=='special'||special.run.runId!==special.pending||!game.restore(special.run)){refund(special);saveSpecial();toMenu();showSpecial();game.toast('근무 복구에 실패해 출근권 1장을 돌려드렸어요.',false,5);}
+}
+function finishSpecial(data){
+ const reward=settle(special,data.runId,data);if(!reward)return;
+ saveSpecial();meta.specialShards=special.shards;saveMeta();sound.setMode('paused');resetControls();
+ openModal(`<div class="eyebrow">특별 근무 결과</div><h2 id="modal-title">${data.won?'진열대 사수 성공!':'다음 근무에 다시 도전해요'}</h2><p class="modal-intro">${formatTime(data.time)} 생존 · ${data.kills}마리 격파</p><div class="guide-tip"><strong>꾸미기 도장 +${reward.shards}</strong><p>누적 ${special.shards}개 · 무료 출근권 ${special.tickets}/3</p>${reward.retry?'<p>첫 실패 재도전 · 출근권 1장을 돌려드렸어요.</p>':''}</div><p>도장 4 / 12 / 24개로 이름표가 자동 해금됩니다.</p><div class="modal-bottom"><button class="primary-button" data-action="special-open">특별 근무 다시 보기</button><button class="secondary-button" data-action="normal-from-special">일반 근무 · 무제한</button></div><button class="quiet-button" data-action="wardrobe">해금한 이름표 착용</button><button class="quiet-button" data-action="menu">로비로</button>`);
+}
+setInterval(()=>{if(menuModal!=='special')return;refill(special);const count=$('special-ticket-count');if(count)count.textContent=`무료 출근권 ${special.tickets} / 3${special.pending?' · 사용 중 1장':''}`;const el=$('special-clock');if(el)el.textContent=special.tickets>=3?'무료 출근권이 모두 찼어요':`다음 출근권 ${formatTime(Math.ceil(Math.max(0,REFILL_MS-(Date.now()-special.clock))/1000))}`;const b=document.querySelector('[data-action="special-start"]');if(b)b.disabled=special.tickets<1;},1000);
 function requestStart(){if(savedRun){menuModal='replace';openModal(`${closeButton}<div class="eyebrow">새 야간 근무</div><h2 id="modal-title">새 근무를 시작할까요?</h2><p class="modal-intro">저장된 ${formatTime(savedRun.t||0)} 근무이 있습니다. 새 근무을 시작하면 진행 중인 근무은 교체됩니다. 아지트 강화와 완료한 근무 일지은 유지됩니다.</p><div class="modal-bottom"><button class="secondary-button" data-action="continue">이어서 하기</button><button class="primary-button" data-action="new-confirm"><span>새 근무 시작</span><span>↗</span></button></div>`,()=>hideModal());}else beginRun();}
 function continueRun(){sound.unlock();game.cosmetics={...meta.cosmetics};if(!game.restore(savedRun)){savedRun=null;write(RUN_STORAGE,null);menuRefresh();openModal(`${closeButton}<div class="eyebrow">근무 기록 확인</div><h2 id="modal-title">근무 일지을 읽을 수 없습니다.</h2><p class="modal-intro">아지트 강화와 완료한 기록은 유지됩니다. 새 근무으로 다시 출근하세요.</p><button class="primary-button" data-action="new-confirm"><span>새 근무 시작</span><span>↗</span></button>`,hideModal);}}
 function toMenu(){sound.setMode('menu');resetControls();hideModal();game.state='menu';game.resetDemo();$('menu').classList.remove('hidden');$('hud').classList.add('hidden');$('pause-btn').classList.add('hidden');document.body.classList.remove('playing');clearTimeout(toastTimer);$('toast').classList.add('hidden');menuRefresh();}
@@ -92,7 +121,7 @@ function showBase(){
   menuModal='base';openModal(`${closeButton}<div class="eyebrow">아지트 살림</div><h2 id="modal-title">우리 아지트를 더 포근하게.</h2><p class="modal-intro">보유 간식 코인 <strong style="color:var(--accent)">${meta.credits.toLocaleString()}</strong> · 강화는 이후 모든 근무에 적용됩니다.</p><div class="base-grid">${BASE_UPGRADES.map(u=>{const n=meta.base[u.id]||0,cost=u.cost*(n+1);return `<article class="base-card"><div class="base-card-head"><h3>${u.icon} ${u.name}</h3><span>${n} / ${u.max}</span></div><p>${u.desc}</p><button data-base="${u.id}" ${n>=u.max||meta.credits<cost?'disabled':''}>${n>=u.max?'최대 강화 완료':`${cost} 간식 코인으로 강화`}</button></article>`;}).join('')}</div><p class="guide-tip">쓰러져도 회수한 간식 코인은 남습니다. 생존 시간, 적 처치, 간식 창고 열기와 간식 봉지로 간식 코인을 모으세요.</p>${meta.wins?`<div class="modal-bottom"><button class="secondary-button" data-action="hard-start">주말 야간조 도전 ↗ · 더 강하고 많은 적</button></div>`:''}<div class="modal-bottom"><button class="primary-button" data-action="close"><span>아지트에서 나가기</span><span>↗</span></button></div>`,hideModal);
 }
 function showRecords(){menuModal='records';openModal(`${closeButton}<div class="eyebrow">근무 일지</div><h2 id="modal-title">우리의 야간 근무 일지</h2><div class="pause-grid"><div class="pause-stat"><b>${meta.runs}</b><span>완료한 근무</span></div><div class="pause-stat"><b>${meta.wins}</b><span>퇴근 성공</span></div><div class="pause-stat"><b>${meta.totalKills.toLocaleString()}</b><span>누적 격파</span></div></div><div class="record-list">${meta.history.length?meta.history.map(r=>`<div class="record-row"><b>${r.won?'퇴근 성공':'조기 퇴근'}</b><span>${CLASSES.find(c=>c.id===r.classId)?.name||'치즈'}</span><span>${formatTime(r.time)}</span><span>${r.kills.toLocaleString()} 격파</span></div>`).join(''):'<p class="modal-intro">아직 남겨진 기록이 없습니다.<br>첫 번째 간식를 보내세요.</p>'}</div><p class="upgrade-note">최근 10개 근무 · 현재 브라우저에 저장</p>`,hideModal);}
-function finishRun(data){const previousBest=meta.bestTime;sound.setMode('ended');
+function finishRun(data){if(game.mode==='special'){finishSpecial(data);return;}const previousBest=meta.bestTime;sound.setMode('ended');
   resetControls();
   if(meta.collection.settled.includes(data.runId))return;meta.collection.settled.push(data.runId);meta.collection.settled=meta.collection.settled.slice(-100);
   result=data;meta.runs++;meta.wins+=data.won?1:0;meta.credits+=data.credits;meta.bestTime=Math.max(meta.bestTime,Math.floor(data.time));meta.bestKills=Math.max(meta.bestKills,data.kills);meta.totalKills+=data.kills;meta.history.unshift({classId:data.classId,time:Math.floor(data.time),kills:data.kills,won:data.won});meta.history=meta.history.slice(0,10);savedRun=null;write(RUN_STORAGE,null);const unlocked=missionUnlocks(meta);if(data.won)meta.collection.tickets++;saveMeta();updateHUD(true);
@@ -128,6 +157,7 @@ function updateHUD(force=false){
   else if(!game.finalDead)objective='<b>간식 회수 완료</b><small>14:00 대왕 청소기 처치</small>';
   else if(game.t<DURATION)objective='<b>퇴근 준비 완료</b><small>15:00까지 생존 · 중앙으로 이동</small>';
   else objective='<b>중앙에서 5초간 생존</b><small>파란색 퇴근 표시를 따라가세요</small>';
+  if(game.mode==='special'){objective=`<b>진열대 사수 · ${formatTime(Math.max(0,240-game.t))} 남음</b><small>4분 생존 · 매 1분 꾸미기 도장 +1</small>`;$('phase-label').textContent='특별 근무';$('relays').textContent='도장 '+Math.min(4,Math.floor(game.t/60))+'/4';}
   if(force||objective!==lastObjective){$('objective').innerHTML=objective;lastObjective=objective;}
   const boss=game.enemies.filter(e=>e.boss&&!e.dead).sort((a,b)=>(b.type==='final')-(a.type==='final'))[0];$('boss-hud').classList.toggle('hidden',!boss);if(boss){$('boss-name').textContent=bossProfile(boss).name+' · '+['경계','출력 상승','최대 출력'][boss.bossStage||0];$('boss-health').textContent=Math.ceil(boss.hp/boss.maxHp*100)+'%';$('boss-fill').style.width=Math.max(0,boss.hp/boss.maxHp*100)+'%';}
   const charging=game.charging,evac=game.t>=900&&game.finalDead&&game.relays.every(r=>r.active)&&game.evacuating>0;
@@ -138,6 +168,7 @@ function updateHUD(force=false){
 $('class-picker').addEventListener('click',e=>{const c=e.target.closest('[data-class]');if(c){selectedClass=c.dataset.class;write(STORAGE+'-selected',selectedClass);sound.play('click');menuRefresh();}});
 $('lobby-home').addEventListener('click',()=>{hideModal();menuRefresh();});
 $('start-btn').addEventListener('click',requestStart);
+$('special-btn').addEventListener('click',showSpecial);
 $('continue-btn').addEventListener('click',continueRun);
 $('wardrobe-btn').addEventListener('click',()=>showWardrobe());
 $('collection-btn').addEventListener('click',()=>showCollection());
@@ -165,6 +196,7 @@ $('modal').addEventListener('click',e=>{
   const upgrade=e.target.closest('[data-upgrade]');if(upgrade){game.choose(upgrade.dataset.upgrade);return;}
   const base=e.target.closest('[data-base]');if(base&&!base.disabled){const u=BASE_UPGRADES.find(u=>u.id===base.dataset.base);const n=meta.base[u.id]||0,cost=u.cost*(n+1);if(n<u.max&&meta.credits>=cost){meta.credits-=cost;meta.base[u.id]=n+1;saveMeta();sound.play('level');menuRefresh();showBase();}return;}
   const button=e.target.closest('[data-action]');if(!button||button.disabled)return;const a=button.dataset.action;if(a==='wardrobe'){toMenu();showWardrobe();return;}
+  if(a==='special-open'){toMenu();showSpecial();return;}if(a==='special-start'){beginSpecial();return;}if(a==='special-continue'){continueSpecial();return;}if(a==='normal-from-special'){toMenu();requestStart();return;}if(a==='special-abandon-ask'){openModal(`${closeButton}<h2 id="modal-title">특별 근무를 포기할까요?</h2><p>사용 중인 출근권 1장은 소비되고 도장 보상은 없습니다. 일반 근무 저장은 유지됩니다.</p><button class="primary-button" data-action="special-abandon">포기 확정</button><button class="secondary-button" data-action="special-open">돌아가기</button>`,showSpecial);return;}if(a==='special-abandon'){settle(special,special.pending,{abandoned:true});saveSpecial();toMenu();showSpecial();return;}
   if(a==='swap-open'){showSwap();return;}if(a==='ending-results'){openModal(endingResultHTML);return;}if(a==='ending-next'){if(endingStep<2){endingStep++;showEnding();}else openModal(endingResultHTML);return;}
   if(a==='draw-cat'){const r=drawCat(meta);if(r){saveMeta();menuRefresh();showCollection(r.duplicate?r.cat.name+' 중복 · 45코인 반환':r.cat.name+' 합류!');}return;}
   if(a==='buy-ticket'){if(buyTicket(meta)){saveMeta();menuRefresh();showCollection('부활권 1장을 받았어요.');}return;}

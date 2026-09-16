@@ -1,9 +1,9 @@
-import {COSMETICS,COSMETIC_DETAILS,SLOT_LABELS,previewLook} from './cosmetics.js?v=cat24';
+import {COSMETICS,COSMETIC_DETAILS,SLOT_LABELS,previewLook} from './cosmetics.js?v=cat25';
 import {endingScene} from './ending-scene.js?v=2';
 import {TestGame} from './test-game.js?v=9';
-import {CLASSES,WEAPONS,UPGRADES,EVOLUTIONS,formatTime} from './data.js?v=cat24';
-import {ACTIVE_SKILLS} from './roster.js?v=cat24';
-import {Sound} from './audio.js?v=cat24';
+import {CLASSES,WEAPONS,UPGRADES,EVOLUTIONS,formatTime} from './data.js?v=cat25';
+import {ACTIVE_SKILLS} from './roster.js?v=cat25';
+import {Sound} from './audio.js?v=cat25';
 const $=id=>document.getElementById(id),settings={sound:true,volume:.55,musicVolume:.4,effectsVolume:.8,particles:true,shake:true},sound=new Sound(settings);
 let toastUntil=0;const g=new TestGame($('world'),{toast:message=>{$('notice').textContent=message;toastUntil=performance.now()+2400;}},sound,settings);
 $('cat').innerHTML=CLASSES.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');$('weapon').innerHTML='<option value="none">전용 스킬만 테스트</option>'+WEAPONS.map(id=>`<option value="${id}">${UPGRADES.find(u=>u.id===id).name}</option>`).join('');$('weapon').value='orbit';

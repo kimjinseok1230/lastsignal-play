@@ -95,3 +95,9 @@ body:not(.playing) .app-lobby.menu-screen{overflow:hidden;padding:0 18px;display
  #app .app-lobby .lobby-stage{min-height:44px!important}
  #app .app-lobby .lobby-mission,#app .app-lobby .lobby-section-title{display:none}
 }
+
+@media(max-height:520px){
+ #app .app-lobby .lobby-stage-title,#app .app-lobby .lobby-cat{display:none}
+ #app .app-lobby .lobby-cat-label{top:8px;bottom:auto;max-width:calc(100% - 52px)}
+ #app .app-lobby .lobby-cat-label[data-frame]{padding:4px 8px}
+}

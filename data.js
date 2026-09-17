@@ -1,5 +1,5 @@
-import {normalizeLook,DEFAULT_LOOK} from './cosmetics.js?v=cat25';
-import {EXTRA_CATS,collectionMeta} from './roster.js?v=cat25';
+import {normalizeLook,DEFAULT_LOOK} from './cosmetics.js?v=cat29';
+import {EXTRA_CATS,collectionMeta} from './roster.js?v=cat29';
 export const VERSION = 1;
 export const EDITION = 2;
 export const DURATION = 900;

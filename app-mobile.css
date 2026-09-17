@@ -127,3 +127,5 @@ body.playing #app .weapon-chip{width:32px;height:36px;flex:none}
 body.playing #app .weapon-chip small{font-size:9px}
 body.playing #app .toast{top:35%;bottom:auto;pointer-events:none}
 @media(max-height:600px){body.playing #app .weapon-dock{display:none}}
+
+.theme-preview{display:block;width:100%;height:auto;aspect-ratio:12/7;border-radius:16px;background:#102832}.cosmetic-card:has(.theme-preview){grid-column:1 / -1}.cosmetic-card:has(.theme-preview) h3{font-size:20px}

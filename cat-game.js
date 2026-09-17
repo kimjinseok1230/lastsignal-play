@@ -1,16 +1,17 @@
-import {SPECIAL_SECONDS} from './special-shift.js?v=cat25';
-import {conceptVisuals} from './concept-visuals.js?v=cat25';
-import {skillVisuals} from './skill-visuals.js?v=cat25';
-import {cosmeticVisuals,normalizeLook} from './cosmetics.js?v=cat25';
-import {buildSystems} from './build-systems.js?v=cat25';
-import {catBosses,bossProfile} from './cat-bosses.js?v=cat25';
-import {zoneFX} from './zone-fx.js?v=cat25';
-import {evolutionFX} from './evolution-fx.js?v=cat25';
-import {catSkills} from './cat-skills.js?v=cat25';
-import {EXTRA_CATS,ACTIVE_SKILLS} from './roster.js?v=cat25';
-import {SignalGame} from './interference.js?v=cat25';
-import {Game} from './game.js?v=cat25';
-import {WORLD,EVOLUTIONS} from './data.js?v=cat25';
+import {drawThemeScene} from './theme-visuals.js?v=cat29';
+import {SPECIAL_SECONDS} from './special-shift.js?v=cat29';
+import {conceptVisuals} from './concept-visuals.js?v=cat29';
+import {skillVisuals} from './skill-visuals.js?v=cat29';
+import {cosmeticVisuals,normalizeLook} from './cosmetics.js?v=cat29';
+import {buildSystems} from './build-systems.js?v=cat29';
+import {catBosses,bossProfile} from './cat-bosses.js?v=cat29';
+import {zoneFX} from './zone-fx.js?v=cat29';
+import {evolutionFX} from './evolution-fx.js?v=cat29';
+import {catSkills} from './cat-skills.js?v=cat29';
+import {EXTRA_CATS,ACTIVE_SKILLS} from './roster.js?v=cat29';
+import {SignalGame} from './interference.js?v=cat29';
+import {Game} from './game.js?v=cat29';
+import {WORLD,EVOLUTIONS} from './data.js?v=cat29';
 const TAU=Math.PI*2;
 const sprites={};
 if(typeof Image!=='undefined')for(const name of ['cat-runner','cat-engineer','cat-warden','robot-cleaner','robot-toy','robot-boss',...EXTRA_CATS.map(c=>'cat-'+c.id)]){const im=new Image();im.src=new URL('./assets/'+name+'.webp',import.meta.url).href;sprites[name]=im;}
@@ -27,7 +28,7 @@ export class CatGame extends SignalGame{
   updateWeapons(dt){const fired=this.u.rail&&this.railTimer-dt<=0;super.updateWeapons(dt);if(fired)this.fireFeatherLaser();}
   pulse(){return this.activateCatSkill();}
   updateEnemy(e,dt){if(e.root>0){e.root=Math.max(0,e.root-dt);e.exposed=Math.max(0,(e.exposed||0)-dt);e.slow=Math.max(0,(e.slow||0)-dt);return;}if(e.boss){this.updateCatBoss(e,dt);return;}super.updateEnemy(e,dt);}
-  drawEffects(c){this.drawCatSkills(c);super.drawEffects(c);this.drawEvolutionEffects(c);this.drawGuardShield(c);this.drawCosmeticEffects(c);this.drawSkillBursts(c);this.drawConceptEffects(c);}
+  drawEffects(c){this.drawCatSkills(c);super.drawEffects(c);this.drawEvolutionEffects(c);this.drawGuardShield(c);this.drawCosmeticEffects(c);this.drawSkillBursts(c);this.drawConceptEffects(c);drawThemeScene(this,c);}
   drawOrbits(c){super.drawOrbits(c);this.drawEvolutionOrbits(c);}
   drawFields(c){super.drawFields(c);this.drawEvolutionFields(c);this.drawIceZone(c);this.drawWebZones(c);this.drawSupportZones(c);this.drawConceptFields(c);}
   applyUpgrade(id){const fresh=!this.evolved[id];super.applyUpgrade(id);const e=EVOLUTIONS.find(e=>e.id===id);if(e&&fresh)this.celebrateEvolution(e);}

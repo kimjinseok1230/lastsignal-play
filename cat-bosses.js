@@ -1,4 +1,4 @@
-import {WORLD} from './data.js?v=cat25';
+import {WORLD} from './data.js?v=cat29';
 const TAU=Math.PI*2,clamp=n=>Math.max(-WORLD+80,Math.min(WORLD-80,n));
 export function bossProfile(e){return e.type==='final'?{name:'야간점장 · 오버클린',sprite:'robot-boss',color:'#ffcc83',hint:'레이저 → 포위 → 청소 폭주'}:e.tier===1?{name:'청소반장 · 돌돌이',sprite:'robot-cleaner',color:'#9fe8d9',hint:'예고선을 피하고 돌진 뒤를 노리세요'}:{name:'냉장고지기 · 프로스티',sprite:'robot-toy',color:'#a9dcff',hint:'냉기 장판 사이 빈 공간으로 이동하세요'};}
 export const catBosses={
